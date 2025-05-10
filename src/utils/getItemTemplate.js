@@ -1,5 +1,9 @@
 import fs from 'fs/promises';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * Reads the last object from the .fhr/template.fhr.json file.
@@ -8,7 +12,7 @@ import path from 'path';
 export default async function getLastTemplateObject() {
     try {
         // Resolve the path to the template file
-        const templatePath = path.resolve(__dirname, '../fhrTemplates/template.fhr.json');
+        const templatePath = path.resolve(process.cwd(), '.fhr/template.fhr.json');
 
         // Read and parse the template file
         const fileContent = await fs.readFile(templatePath, 'utf-8');

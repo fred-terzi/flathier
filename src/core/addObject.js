@@ -51,5 +51,5 @@ export default async function addObject(data, outlineNumber) {
   // 4. Recompute outlines for the entire data array
   computeOutlines(data);
 
-  return { data, selectedIndex: newSelectedIndex };
+  return data;
 }
