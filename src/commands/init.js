@@ -6,9 +6,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import generateUniqueId  from '../utils/generateUniqueId.js';
-
-console.log('Initializing project...');
+import generateUniqueId from '../utils/generateUniqueId.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,83 +34,52 @@ async function findProjectRoot(start = __dirname) {
   }
 }
 
-
 /**
  * Initializes the project by creating necessary directories and files.
  * @param {string} [fileName='fhr'] - The base name for the main FHR file.
  * @returns {Promise<void>}
  */
-export async function init(fileName = 'fhr') {
+export default async function init(fileName = 'fhr') {
   const root = await findProjectRoot();
 
-  // Create .fhr directory
+  // Set paths
   const folderPath = path.join(root, '.fhr');
-  const relativePath = path.relative(process.cwd(), folderPath);
-  console.log(`Creating folder at: ${relativePath}`);
-  await fs.mkdir(folderPath, { recursive: true });
-
-  // Copy template file to .fhr directory
-  const destinationPath = path.join(folderPath, 'template.fhr.json');
   const templatePath = path.join(root, 'src', 'fhrTemplates', 'fhrTemplate.json');
-  const templateRelativePath = path.relative(process.cwd(), destinationPath);
-  console.log(`Copying template to ${templateRelativePath}`);
-  try {
-    await fs.copyFile(templatePath, destinationPath);
-  } catch (error) {
-    console.error('Error copying template:', error);
-  }
-
-  // Change the title of the first item in the template to the file name
-  try {
-    const templateData = await fs.readFile(destinationPath, 'utf-8');
-    const updatedTemplateData = templateData.replace(/"title": ".*?"/, `"title": "${fileName}"`);
-    await fs.writeFile(destinationPath, updatedTemplateData);
-    console.log(`Updated template title to "${fileName}"`);
-  }
-  catch (error) {
-    console.error('Error updating template title:', error);
-  }
-
-  // Generate a unique ID for each item in the template
-    try {
-        const templateData = await fs.readFile(destinationPath, 'utf-8');
-        const updatedTemplateData = templateData.replace(/"id": ".*?"/g, `"id": "${generateUniqueId()}"`);
-        await fs.writeFile(destinationPath, updatedTemplateData);
-        console.log(`Updated template IDs`);
-    }
-    catch (error) {
-        console.error('Error updating template IDs:', error);
-    }
-
-  // Create main FHR file
+  const destinationPath = path.join(folderPath, 'template.fhr.json');
   const mainFileName = fileName.endsWith('.fhr.json') ? fileName : `${fileName}.fhr.json`;
   const mainFilePath = path.join(root, mainFileName);
-  const mainFileRelativePath = path.relative(process.cwd(), mainFilePath);
-  console.log(`Creating main file at: ${mainFileRelativePath}`);
-  try {
-    const templateData = await fs.readFile(templatePath, 'utf-8');
-    const parsedData = JSON.parse(templateData);
 
-    // Ensure the parsed data is an array
-    if (Array.isArray(parsedData)) {
-      parsedData.forEach((item) => {
-        if (typeof item === 'object' && item !== null) {
-          item.unique_id = generateUniqueId();
-        }
-      });
-    } else {
-      console.error('Template data is not a flat array.');
+  console.log(`Creating folder at: ${path.relative(process.cwd(), folderPath)}`);
+  await fs.mkdir(folderPath, { recursive: true });
+
+  try {
+    // Read and parse the base template
+    const rawTemplateData = await fs.readFile(templatePath, 'utf-8');
+    const templateArray = JSON.parse(rawTemplateData);
+
+    if (!Array.isArray(templateArray)) {
+      throw new Error('Template data is not a flat array of objects');
     }
 
-    await fs.writeFile(mainFilePath, JSON.stringify(parsedData, null, 2));
+    // Save clean template with updated title only
+    const cleanedTemplate = templateArray.map((item, index) => ({
+      ...item,
+      title: index === 0 ? fileName : item.title,
+    }));
+    await fs.writeFile(destinationPath, JSON.stringify(cleanedTemplate, null, 2));
+    console.log(`Wrote clean template to: ${path.relative(process.cwd(), destinationPath)}`);
+
+    // Create working copy with unique IDs
+    const workingCopy = cleanedTemplate.map(item => ({
+      ...item,
+      unique_id: generateUniqueId(),
+    }));
+    await fs.writeFile(mainFilePath, JSON.stringify(workingCopy, null, 2));
+    console.log(`Created working file at: ${path.relative(process.cwd(), mainFilePath)}`);
+
   } catch (error) {
-    console.error('Error creating main file:', error);
+    console.error('Error during initialization:', error);
   }
 
   console.log('Initialization complete.');
 }
-
-// Execute the init function with the provided argument
-init(process.argv[2]).catch((error) => {
-  console.error('Error during initialization:', error);
-});
