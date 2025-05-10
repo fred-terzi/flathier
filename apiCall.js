@@ -21,9 +21,18 @@ async function main() {
   } catch (err) {
     console.error('Error:', err);
   }
-  // Delete object with outline 1
-  await fhr.deleteObject(data, '1');
-  console.log('Data after deleting object:', data);
+
+  // Demote object with outline 1
+  const outlineToDemote = '1';
+  data = await fhr.demote(data, outlineToDemote);
+  console.log('Data after demoting object:', data);
+
+
+
+
+    // Delete object with outline 1
+    await fhr.deleteObject(data, '1');
+    console.log('Data after deleting object:', data);
 }
 
 main();

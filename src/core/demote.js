@@ -1,4 +1,5 @@
-import { flattenTree } from '../utils/flattenTree.js';
+import flattenTree from '../utils/flattenTree.js';
+import buildTree from '../utils/buildTree.js';
 
 /**
  * Demotes a node (and its entire subtree) one level deeper in the hierarchy,
@@ -34,18 +35,3 @@ export default function demote(data, outlineToDemote) {
     return flattenTree(roots); // Return the updated data
 }
 
-/**
- * Utility: builds a tree structure and index map from flat items
- */
-function buildTree(items) {
-    const nodes = items.map(i => ({ ...i, children: [] }));
-    const nodeMap = {};
-    nodes.forEach(n => { nodeMap[n.outline] = n; });
-    const roots = [];
-    nodes.forEach(n => {
-        const parts = n.outline.split('.');
-        if (parts.length === 1) roots.push(n);
-        else nodeMap[parts.slice(0, -1).join('.')].children.push(n);
-    });
-    return { roots, nodeMap };
-}
