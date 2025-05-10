@@ -16,7 +16,7 @@ async function main() {
     console.log('Loaded data:', data);
 
     // Add a new object to the data
-    data = await flathier.addObject(data, flathier.getLastItemOutline(data));
+    data = flathier.addObject(data, flathier.getLastItemOutline(data));
     console.log('Data after adding object:', data);
   } catch (err) {
     console.error('Error:', err);
