@@ -40,7 +40,7 @@ async function findProjectRoot(start = __dirname) {
  * @param {string} [fileName='fhr'] - The base name for the main FHR file.
  * @returns {Promise<void>}
  */
-export default async function init(fileName = 'fhr') {
+export default async function init(fileName = 'FlatHier') {
   const root = await findProjectRoot();
     // Sanitize the file name to replace spaces with underscores
     fileName = sanitizeSpaces(fileName);

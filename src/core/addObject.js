@@ -1,25 +1,7 @@
 // src/commands/addObject.js
-import crypto from 'crypto';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
-import { dirname, resolve } from 'path';
-import { generateUniqueId } from '../utils/generateUniqueId.js';
-import { computeOutlines } from '../utils/computeOutlines.js';
-
-// ──────────────────────────────────────────────────────────
-// Load template JSON via fs to avoid the experimental JSON-module warning
-// ──────────────────────────────────────────────────────────
-const __filename   = fileURLToPath(import.meta.url);
-const __dirname    = dirname(__filename);
-const templatePath = resolve(__dirname, '../../templates/newObjectTemplate.json');
-
-let template;
-try {
-  const raw = fs.readFileSync(templatePath, 'utf8');
-  template  = JSON.parse(raw);
-} catch (err) {
-  throw new Error(`Failed to load template at ${templatePath}: ${err.message}`);
-}
+import generateUniqueId from '../utils/generateUniqueId.js';
+import computeOutlines from '../utils/computeOutlines.js';
+import getLastTemplateObject from '../utils/getItemTemplate.js';
 
 /**
  * Inserts a new object immediately after the item with the specified outline number,
@@ -29,7 +11,17 @@ try {
  * @param {string} outlineNumber - The outline number of the item after which to insert.
  * @returns {{ data: Array<Object>, selectedIndex: number } | void}
  */
-export function addObject(data, outlineNumber) {
+export default async function addObject(data, outlineNumber) {
+  let template;
+  try {
+    template = await getLastTemplateObject();
+    if (!template) {
+      throw new Error('Template is empty or could not be loaded.');
+    }
+  } catch (err) {
+    throw new Error(`Failed to load template: ${err.message}`);
+  }
+
   // 1. Find the selected index based on the outline number
   const selectedIndex = data.findIndex(item => item.outline === outlineNumber);
 
