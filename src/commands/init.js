@@ -6,6 +6,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import generateUniqueId  from '../utils/generateUniqueId.js';
 
 console.log('Initializing project...');
 
@@ -72,14 +73,38 @@ export async function init(fileName = 'fhr') {
     console.error('Error updating template title:', error);
   }
 
+  // Generate a unique ID for each item in the template
+    try {
+        const templateData = await fs.readFile(destinationPath, 'utf-8');
+        const updatedTemplateData = templateData.replace(/"id": ".*?"/g, `"id": "${generateUniqueId()}"`);
+        await fs.writeFile(destinationPath, updatedTemplateData);
+        console.log(`Updated template IDs`);
+    }
+    catch (error) {
+        console.error('Error updating template IDs:', error);
+    }
+
   // Create main FHR file
   const mainFileName = fileName.endsWith('.fhr.json') ? fileName : `${fileName}.fhr.json`;
   const mainFilePath = path.join(root, mainFileName);
   const mainFileRelativePath = path.relative(process.cwd(), mainFilePath);
   console.log(`Creating main file at: ${mainFileRelativePath}`);
   try {
-    const templateData = await fs.readFile(destinationPath, 'utf-8');
-    await fs.writeFile(mainFilePath, templateData);
+    const templateData = await fs.readFile(templatePath, 'utf-8');
+    const parsedData = JSON.parse(templateData);
+
+    // Ensure the parsed data is an array
+    if (Array.isArray(parsedData)) {
+      parsedData.forEach((item) => {
+        if (typeof item === 'object' && item !== null) {
+          item.unique_id = generateUniqueId();
+        }
+      });
+    } else {
+      console.error('Template data is not a flat array.');
+    }
+
+    await fs.writeFile(mainFilePath, JSON.stringify(parsedData, null, 2));
   } catch (error) {
     console.error('Error creating main file:', error);
   }
