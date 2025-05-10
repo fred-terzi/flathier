@@ -27,7 +27,10 @@ async function main() {
   data = await fhr.demote(data, outlineToDemote);
   console.log('Data after demoting object:', data);
 
-
+  // Promote object with outline 0.1
+  const outlineToPromote = '0.1';
+  data = await fhr.promote(data, outlineToPromote);
+  console.log('Data after promoting object:', data);
 
 
     // Delete object with outline 1
