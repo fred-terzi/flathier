@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 import init from '../src/commands/init.js';
 
+// Set the FHR_ROOT_DIR environment variable
+process.env.FHR_ROOT_DIR = process.cwd(); // Sets it to the current working directory
+
 // Simple CLI argument parser without dependencies
 const args = process.argv.slice(2);
 
