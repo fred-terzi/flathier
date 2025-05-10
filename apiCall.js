@@ -22,16 +22,24 @@ async function main() {
     console.error('Error:', err);
   }
 
-  // Demote object with outline 1
-  const outlineToDemote = '1';
+  // Demote object with outline 2
+  const outlineToDemote = '2';
   data = await fhr.demote(data, outlineToDemote);
   console.log('Data after demoting object:', data);
 
-  // Promote object with outline 0.1
-  const outlineToPromote = '0.1';
-  data = await fhr.promote(data, outlineToPromote);
-  console.log('Data after promoting object:', data);
+  // Add a new item under 1
+  data = await fhr.addObject(data, '1');
+  console.log('Data after adding object under 1:', data);
 
+
+
+  // Move up item 2
+  data = await fhr.moveUp(data, '2');
+  console.log(`Data after move up`, data);
+
+  // Move down item 1
+  data = await fhr.moveDown(data, '1');
+  console.log(`Data after move down`, data);
 
     // Delete object with outline 1
     await fhr.deleteObject(data, '1');

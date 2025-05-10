@@ -1,3 +1,5 @@
+import computeOutlines from "../utils/computeOutlines.js";
+
 /**
  * Moves a node (and its entire subtree) up one position among its siblings
  * and reassigns new outline numbers for all nodes.
@@ -52,5 +54,6 @@ export default function moveUp(items, outlineToMove) {
     newItems.forEach(item => {
       delete item.children;
     });
-    return { newItems, itemToMove };
+    const updateData = computeOutlines(newItems);
+    return updateData;
   }

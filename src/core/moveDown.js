@@ -1,3 +1,5 @@
+import computeOutlines from "../utils/computeOutlines.js";
+
 /**
  * Moves the selected item and all its children down one position among its siblings.
  * Updates the order of objects in the JSON without recalculating outline numbers.
@@ -51,6 +53,6 @@ export default function moveDown(items, outlineToMove) {
     newItems.forEach(item => {
       delete item.children;
     });
-    return  { newItems, itemToMove }; // Return an object with the updated items and selectedIndex
+    const updateData = computeOutlines(newItems);
+    return updateData;
 }
-
