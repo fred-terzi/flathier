@@ -16,11 +16,14 @@ async function main() {
     console.log('Loaded data:', data);
 
     // Add a new object to the data
-    data = flathier.addObject(data, flathier.getLastItemOutline(data));
+    data = await flathier.addObject(data, await flathier.getLastItemOutline(data));
     console.log('Data after adding object:', data);
   } catch (err) {
     console.error('Error:', err);
   }
+  // Delete object with outline 1
+  await flathier.deleteObject(data, '1');
+  console.log('Data after deleting object:', data);
 }
 
 main();
