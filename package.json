@@ -15,5 +15,8 @@
   "exports": {
     "./flathier": "./bin/api.js"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "vitest": "^3.1.3"
+  }
 }

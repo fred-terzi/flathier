@@ -9,21 +9,16 @@ const __dirname = path.dirname(__filename);
 
 async function findProjectRoot(start = __dirname) {
   let dir = start;
-  console.log(`Starting search for project root from: ${start}`);
   while (true) {
     const maybePkg = path.join(dir, 'package.json');
-    console.log(`Checking for package.json at: ${maybePkg}`);
     try {
       await fs.access(maybePkg);
-      console.log(`Found package.json at: ${dir}`);
       return dir;
     } catch {
       const parent = path.dirname(dir);
       if (parent === dir) {
-        console.error('package.json not found');
         throw new Error('package.json not found');
       }
-      console.log(`Moving up to parent directory: ${parent}`);
       dir = parent;
     }
   }
@@ -32,34 +27,58 @@ async function findProjectRoot(start = __dirname) {
 // Copy fhrTemplate to the .frh folder
 async function copyTemplateToFolder(root, folderPath) {
   const templatePath = path.join(root, 'src', 'fhrTemplates', 'fhrTemplate.json');
-  const destinationPath = path.join(folderPath, 'template.json');
-  console.log(`Copying template from ${templatePath} to ${destinationPath}`);
+  const destinationPath = path.join(folderPath, 'template.fhr.json');
+  const templateRelativePath = path.relative(process.cwd(), destinationPath);
+  console.log(`Copying template to ${templateRelativePath}`);
   try {
     await fs.copyFile(templatePath, destinationPath);
-    console.log('Template copied successfully.');
   } catch (error) {
     console.error('Error copying template:', error);
   }
 }
 
-export async function init() {
-  console.log('Initializing project...');
-  const root = await findProjectRoot();
-  console.log(`Project root found at: ${root}`);
-  const folderPath = path.join(root, '.fhr');
-  console.log(`Creating folder at: ${folderPath}`);
-  await fs.mkdir(folderPath, { recursive: true });
-  console.log('Folder created successfully.');
+// Create fhr project file in main directory
+async function createFhrFile(root, fileName) {
+  const fhrFilePath = path.join(root, fileName);
+  const fhrFileRelativePath = path.relative(process.cwd(), fhrFilePath);
+  console.log(`Creating FHR file at: ${fhrFileRelativePath}`);
+  try {
+    await fs.writeFile(fhrFilePath, JSON.stringify({}));
+  } catch (error) {
+    console.error('Error creating FHR file:', error);
+  }
+}
 
-  await copyTemplateToFolder(root, folderPath);
+export async function init(fileName = 'fhr') {
+  const root = await findProjectRoot();
+  const folderPath = path.join(root, '.fhr');
+  const relativePath = path.relative(process.cwd(), folderPath);
+  console.log(`Creating folder at: ${relativePath}`);
+  await fs.mkdir(folderPath, { recursive: true });
+
+  const destinationPath = path.join(folderPath, 'template.fhr.json');
+  const templatePath = path.join(root, 'src', 'fhrTemplates', 'fhrTemplate.json');
+  const templateRelativePath = path.relative(process.cwd(), destinationPath);
+  console.log(`Copying template to ${templateRelativePath}`);
+  try {
+    await fs.copyFile(templatePath, destinationPath);
+  } catch (error) {
+    console.error('Error copying template:', error);
+  }
+
+  const mainFileName = fileName.endsWith('.fhr.json') ? fileName : `${fileName}.fhr.json`;
+  const mainFilePath = path.join(root, mainFileName);
+  const mainFileRelativePath = path.relative(process.cwd(), mainFilePath);
+  console.log(`Creating main file at: ${mainFileRelativePath}`);
+  try {
+    await fs.writeFile(mainFilePath, JSON.stringify({}));
+  } catch (error) {
+    console.error('Error creating main file:', error);
+  }
+
   console.log('Initialization complete.');
 }
 
-
-init()
-  .then(() => {
-    console.log('Initialization complete.');
-  })
-  .catch((error) => {
-    console.error('Error during initialization:', error);
-  });
+init(process.argv[2]).catch((error) => {
+  console.error('Error during initialization:', error);
+});
