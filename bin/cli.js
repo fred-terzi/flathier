@@ -14,16 +14,21 @@ if (args.length === 0) {
   process.exit(1);
 }
 
-console.log('Arguments:', args);
+
 
 // Check first arg for command
 const command = args[0];
 const options = args.slice(1);
-console.log('Command:', command);
-console.log('Options:', options);
+
 
 // Handle the init command
 if (command === 'init') {
   const fileName = options[0];
-  await init(fileName);
+  const sanitizedFileName = fileName.replace(/\s+/g, '_'); // Replace spaces with underscores
+  if (fileName) {
+    await init(sanitizedFileName);
+  } else {
+    console.error('Error: No file name provided for init command.');
+    process.exit(1);
+  }
 }
