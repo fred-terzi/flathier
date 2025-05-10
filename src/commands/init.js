@@ -71,7 +71,8 @@ export async function init(fileName = 'fhr') {
   const mainFileRelativePath = path.relative(process.cwd(), mainFilePath);
   console.log(`Creating main file at: ${mainFileRelativePath}`);
   try {
-    await fs.writeFile(mainFilePath, JSON.stringify({}));
+    const templateData = await fs.readFile(templatePath, 'utf-8');
+    await fs.writeFile(mainFilePath, templateData);
   } catch (error) {
     console.error('Error creating main file:', error);
   }
