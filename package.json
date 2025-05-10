@@ -14,5 +14,6 @@
   },
   "exports": {
     "./flathier": "./bin/api.js"
-  }
+  },
+  "type": "module"
 }
