@@ -7,6 +7,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import generateUniqueId from '../utils/generateUniqueId.js';
+import sanitizeSpaces from '../utils/sanitizeSpaces.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,7 +42,8 @@ async function findProjectRoot(start = __dirname) {
  */
 export default async function init(fileName = 'fhr') {
   const root = await findProjectRoot();
-
+    // Sanitize the file name to replace spaces with underscores
+    fileName = sanitizeSpaces(fileName);
   // Set paths
   const folderPath = path.join(root, '.fhr');
   const templatePath = path.join(root, 'src', 'fhrTemplates', 'fhrTemplate.json');
