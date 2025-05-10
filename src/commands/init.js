@@ -24,19 +24,6 @@ async function findProjectRoot(start = __dirname) {
   }
 }
 
-// Copy fhrTemplate to the .frh folder
-async function copyTemplateToFolder(root, folderPath) {
-  const templatePath = path.join(root, 'src', 'fhrTemplates', 'fhrTemplate.json');
-  const destinationPath = path.join(folderPath, 'template.fhr.json');
-  const templateRelativePath = path.relative(process.cwd(), destinationPath);
-  console.log(`Copying template to ${templateRelativePath}`);
-  try {
-    await fs.copyFile(templatePath, destinationPath);
-  } catch (error) {
-    console.error('Error copying template:', error);
-  }
-}
-
 // Create fhr project file in main directory
 async function createFhrFile(root, fileName) {
   const fhrFilePath = path.join(root, fileName);
