@@ -1,0 +1,11 @@
+{
+  "name": "flathier",
+  "version": "0.1.0-demo.1",
+  "description": "Create and manipulate hierarchical data stored in a flat json. ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Joseph Terzi",
+  "license": "MIT"
+}
