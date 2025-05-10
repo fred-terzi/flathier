@@ -1,7 +1,7 @@
 
 import init from '../src/commands/init.js';
 import addObject from '../src/core/addObject.js';
-import deteleObject from '../src/core/deleteObject.js';
+import deleteObject from '../src/core/deleteObject.js';
 
 // Data handling functions
 import { loadData, saveData  } from '../src/dataHandler.js';
@@ -17,6 +17,7 @@ const flathier = {
   addObject,
   getLastItemOutline,
   getLastTemplateObject,
+  deleteObject
 };
 
 export default flathier;
