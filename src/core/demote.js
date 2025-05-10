@@ -7,7 +7,7 @@ import { flattenTree } from '../utils/flattenTree.js';
  * @param selectedIndex - index of the selected item to be demoted
  * @returns updated data array
  */
-export function demote(data, outlineToDemote) {
+export default function demote(data, outlineToDemote) {
 
     if (!outlineToDemote) {
         return data; // Return unchanged data if no valid selection

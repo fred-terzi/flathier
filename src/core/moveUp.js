@@ -5,7 +5,7 @@
  * @param {string} outlineToMove - The outline number of the node to move (e.g. "2.1").
  * @returns {Array} A new array with updated hier and outline fields.
  */
-export function moveUp(items, outlineToMove) {
+export default function moveUp(items, outlineToMove) {
     // Get the unique_id of the item to move
     const itemToMove = items.find(i => i.outline === outlineToMove);
     // Build node objects with children

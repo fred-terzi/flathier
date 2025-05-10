@@ -6,7 +6,7 @@
  * @param {string} outlineToMove - The outline string of the node to move (e.g., "2.1").
  * @returns {Array<Object>} The updated array with the moved item.
  */
-export function moveDown(items, outlineToMove) {
+export default function moveDown(items, outlineToMove) {
     // Get the unique_id of the item to move
     const itemToMove = items.find(i => i.outline === outlineToMove);
     // Build node objects with children

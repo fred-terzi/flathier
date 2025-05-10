@@ -9,7 +9,7 @@ import { exitWithoutClear } from '../utils/exitWithoutClear.js';
  * @param {string} outlineNumber - The outline number of the item to delete.
  * @returns {{ data: Array<Object>, selectedIndex: number|null } | void}
  */
-export function deleteObject(data, outlineNumber) {
+export default function deleteObject(data, outlineNumber) {
   // Add a condition to prevent deletion if there are only two objects left
   if (data.length <= 2) {
     console.error('⚠️  Cannot delete items when only two objects remain in the data.');
