@@ -7,5 +7,12 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Joseph Terzi",
-  "license": "MIT"
+  "license": "MIT",
+  "bin": {
+    "fhr": "bin/cli.js",
+    "fhr-editor": "bin/fhr-editor.js"
+  },
+  "exports": {
+    "./flathier": "./bin/api.js"
+  }
 }
