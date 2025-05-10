@@ -21,9 +21,8 @@ const options = args.slice(1);
 // Handle the init command
 if (command === 'init') {
   const fileName = options[0];
-  const sanitizedFileName = fileName.replace(/\s+/g, '_'); // Replace spaces with underscores
   if (fileName) {
-    await init(sanitizedFileName);
+    await init(fileName);
   } else {
     console.error('Error: No file name provided for init command.');
     process.exit(1);
