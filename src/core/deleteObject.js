@@ -34,5 +34,5 @@ export default function deleteObject(data, outlineNumber) {
   // Recompute outlines for the entire data array
   computeOutlines(data);
 
-  return { data };
+  return data ;
 }

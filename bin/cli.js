@@ -78,6 +78,24 @@ if (args.length === 0) {
         console.error(`❌ Error: ${error.message}`);
       }
     },
+    delete: async (options) => {
+      const { loadData, saveData } = await import('../src/dataHandler.js');
+      const { default: deleteObject } = await import('../src/core/deleteObject.js');
+      try {
+        const data = await loadData();
+        const outline = options[0];
+        const updatedData = await deleteObject(data, outline);
+
+        if (updatedData) {
+          await saveData(updatedData);
+          console.log('✅ Successfully deleted the last item.');
+        } else {
+          console.error('⚠️  Failed to delete the last item.');
+        }
+      } catch (error) {
+        console.error(`❌ Error: ${error.message}`);
+      }
+    },
     editor: async () => {
       const { spawn } = await import('child_process');
       const editorProcess = spawn('node', ['./bin/fhr-editor.js'], {

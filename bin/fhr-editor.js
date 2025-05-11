@@ -70,11 +70,19 @@ const keyMap = {
     tree = result.tree;
     selectedIndex = result.selectedIndex;
   },
-  delete: async (str, key) => {
-    const outline = tree[selectedIndex + 1].outline;
-    data = await fhr.deleteObject(data, outline);
-    await fhr.saveData(data);
-    tree = await fhr.createAsciiTree(data, ['title', 'unique_id']);
+  backspace: async (str, key) => {
+    const outline = data[selectedIndex + 1].outline;
+    console.log('Deleting item with outline:', outline);
+    // Call the deleteObject function from fhr
+    const updatedData = await fhr.deleteObject(data, outline);
+    // Save the updated data
+    await fhr.saveData(updatedData);
+    // Recreate the tree
+    tree = await fhr.createAsciiTree(updatedData, ['title', 'unique_id']);
+    // Update the selectedIndex
+    selectedIndex = Math.max(0, selectedIndex - 1);
+    // Render the updated tree to the console
+    resetScreen();
     await renderToConsole(tree, selectedIndex);
   },
   // Add more key handlers here
