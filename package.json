@@ -4,7 +4,8 @@
   "description": "Create and manipulate hierarchical data stored in a flat json. ",
   "main": "index.js",
   "scripts": {
-    "test": "vitest"
+    "test": "vitest",
+    "start": "NO_PROGRESS_BAR=1 node your-cli.js"
   },
   "author": "Joseph Terzi",
   "license": "MIT",
