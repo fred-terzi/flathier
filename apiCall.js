@@ -2,6 +2,7 @@
 process.env.FHR_ROOT_DIR = process.cwd(); // Sets it to the current working directory
 
 import fhr from './bin/api.js';
+import { renderToConsole } from './src/renderers/consoleRenderer.js';
 
 const projectName = "Test 1";
 
@@ -51,6 +52,11 @@ async function main() {
     const fieldsToInclude = ['title', 'unique_id'];
     const asciiTree = await fhr.createAsciiTree(data, fieldsToInclude);
     console.log('ASCII Tree:', asciiTree);
+
+    console.log('\x1Bc'); // Clear the console and scroll buffer
+    // Render the ASCII tree to the console
+    await renderToConsole(asciiTree, 0);
 }
+
 
 main();

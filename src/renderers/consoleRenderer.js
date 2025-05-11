@@ -1,35 +1,10 @@
-import { createAsciiTree } from '../../src/index.js';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import DataService from '../../src/services/DataService.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname  = path.dirname(__filename);
-
-// Update the configPath to point to the configuration file in the package directory
-const configPath = path.resolve(__dirname, '../../flat-hier.config.json');
-const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-
-const templateFilePath = path.resolve(process.cwd(), config.templateFileName);
-const treeDataFilePath = path.resolve(process.cwd(), config.filepath);
-
-// Lazy initialize DataService only when required
-let dataService;
-
-function getDataService() {
-    if (!dataService) {
-        dataService = new DataService();
-    }
-    return dataService;
-}
 
 let _lastRendered = {
   lines: [],         // array of strings (with trailing "\n")
   highlighted: null, // which index was inverted last time
   root: '',          // the rootNode line
   data: null,        // the current data
-  selectedIndex: 0   // the current selected index
+  selectedIndex: 0,  // the current selected index
 };
 
 // Truncate a string to the current terminal width
@@ -40,16 +15,11 @@ function truncateToWidth(str) {
   return body.slice(0, cols) + (hasNL ? '\n' : '');
 }
 
-export async function renderToConsole(data, selectedIndex) {
-  const ds = getDataService();
-  await ds.loadData();
-  _lastRendered.data = data;
-  _lastRendered.selectedIndex = selectedIndex;
+export async function renderToConsole(tree, selectedIndex) {
 
-  const tree       = await createAsciiTree(data);
   const rootNode   = tree[0];
   const bodyLines  = tree.slice(1);
-  selectedIndex    = Math.max(0, selectedIndex - 1);
+  selectedIndex    = Math.max(0, selectedIndex);
 
   const { startIndex, endIndex } = calculateVisibleRange(bodyLines, selectedIndex);
   const visible   = bodyLines.slice(startIndex, endIndex);
@@ -141,7 +111,7 @@ process.on('SIGWINCH', async () => {
     data: null,
     selectedIndex: 0
   };
-  console.log('Resize detected. Resetting rendering state.');
+  console.log('Resize detected.');
 
   try {
     const ds = getDataService();
