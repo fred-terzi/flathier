@@ -81,8 +81,14 @@ const keyMap = {
 
       const lastItemOutline = await fhr.getLastItemOutline(data);
       data = await fhr.addObject(data, lastItemOutline, title);
+      // Get new last item outline
+        const newLastItemOutline = await fhr.getLastItemOutline(data);
+      // set the title of the new item
+      const newItem = data.find((item) => item.outline === newLastItemOutline);
+        newItem.title = title;
       await fhr.saveData(data);
       tree = await fhr.createAsciiTree(data, ['title', 'unique_id']);
+      console.log('\x1Bc'); // Clear the console and scroll buffer
       await renderToConsole(tree, selectedIndex);
     } catch (err) {
       console.error('Error adding item:', err);
