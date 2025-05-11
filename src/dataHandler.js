@@ -40,7 +40,10 @@ async function findFhrFile() {
   const root = await findProjectRoot();
   const files = await fs.readdir(root);
   const fhrFile = files.find(f => f.endsWith('.fhr.json'));
-  if (!fhrFile) throw new Error('No .fhr.json file found in root directory.');
+  if (!fhrFile) {
+    console.warn('No .fhr.json file found in root directory.');
+    return null;
+  }
 
   cachedFilePath = path.join(root, fhrFile);
   return cachedFilePath;
@@ -53,6 +56,9 @@ async function findFhrFile() {
  */
 export async function loadData() {
   const filePath = await findFhrFile();
+  if (!filePath) {
+    throw new Error('No .fhr.json file found in the root directory.');
+  }
   const raw = await fs.readFile(filePath, 'utf-8');
   cachedData = JSON.parse(raw);
   return cachedData;

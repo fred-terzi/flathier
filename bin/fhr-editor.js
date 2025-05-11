@@ -3,6 +3,17 @@ import readline from 'readline';
 import renderToConsole from '../src/renderers/consoleRenderer.js';
 import fhr from 'flathier';
 
+// Suppress built-in error messages and exit gracefully
+process.on('uncaughtException', (err) => {
+
+    process.exit(1);
+  });
+  
+  process.on('unhandledRejection', (reason, promise) => {
+
+    process.exit(1);
+  });
+
 // Enable keypress events on stdin
 readline.emitKeypressEvents(process.stdin);
 if (process.stdin.isTTY) {
