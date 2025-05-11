@@ -1,6 +1,13 @@
 #!/usr/bin/env node
+
+// Data handling functions
+import { loadData, saveData } from '../src/dataHandler.js';
+// Command functions
 import displayHelp from '../src/commands/help.js';
 import init from '../src/commands/init.js';
+
+// Core functions
+import addObject from '../src/core/addObject.js';
 
 // Set the FHR_ROOT_DIR environment variable
 process.env.FHR_ROOT_DIR = process.cwd(); // Sets it to the current working directory
@@ -25,7 +32,28 @@ const commands = {
     if (fileName) {
       await init(fileName);
     } else {
-      console.error('Error: No file name provided for init command.');
+      console.error('❌ Error: No file name provided for init command. \nUsage: fhr init "<file_name>"');
+      process.exit(1);
+    }
+  },
+  add_after: async (options) => {
+    const outline = options[0];
+    if (outline) {
+      try {
+        const data = await loadData();
+        const updatedData = await addObject(data, outline);
+
+        if (updatedData) {
+          await saveData(updatedData);
+          console.log(`✅ Successfully added a new item after outline: ${outline}`);
+        } else {
+          console.error(`⚠️  Failed to add a new item after outline: ${outline}`);
+        }
+      } catch (error) {
+        console.error(`❌ Error: ${error.message}`);
+      }
+    } else {
+      console.error('Error: No outline provided for add-after command.');
       process.exit(1);
     }
   },
