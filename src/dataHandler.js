@@ -41,7 +41,7 @@ async function findFhrFile() {
   const files = await fs.readdir(root);
   const fhrFile = files.find(f => f.endsWith('.fhr.json'));
   if (!fhrFile) {
-    console.warn('No .fhr.json file found in root directory.');
+    console.warn('❌ No .fhr.json file found in root directory.\nUsage: fhr init "<file_name>"');
     return null;
   }
 

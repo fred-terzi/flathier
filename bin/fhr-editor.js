@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import readline from 'readline';
-import renderToConsole from '../src/renderers/consoleRenderer.js';
+import {renderToConsole, resetScreen} from '../src/renderers/consoleRenderer.js';
 import fhr from 'flathier';
 
 // Suppress built-in error messages and exit gracefully
@@ -45,7 +45,7 @@ let data = await fhr.loadData();
 let tree = await fhr.createAsciiTree(data, ['title', 'unique_id']);
 
 // Render the initial tree to the console
-console.log('\x1Bc'); // Clear the console and scroll buffer
+resetScreen();
 await renderToConsole(tree, selectedIndex);
 
 // Key handlers
@@ -73,7 +73,7 @@ const keyMap = {
       });
 
       if (!title.trim()) {
-        console.log('Title cannot be empty. Operation canceled.');
+        console.log('⚠️ Title cannot be empty. Operation canceled.');
         return;
       }
 
@@ -91,7 +91,7 @@ const keyMap = {
       console.log('\x1Bc'); // Clear the console and scroll buffer
       await renderToConsole(tree, selectedIndex);
     } catch (err) {
-      console.error('Error adding item:', err);
+      console.error('❌ Error adding item:', err);
     } finally {
       rl.close();
       process.stdin.setRawMode(true);
@@ -119,7 +119,7 @@ process.stdin.on('keypress', (str, key) => {
 
   if (handler) {
     Promise.resolve(handler(str, key)).catch((err) => {
-      console.error('Handler error:', err);
+      console.error('❌ Handler error:', err);
       process.stdin.setRawMode(true);
     });
   }

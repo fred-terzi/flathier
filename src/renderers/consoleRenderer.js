@@ -1,3 +1,5 @@
+
+
 let _lastRendered = {
   lines: [],         // array of strings (with trailing "\n")
   highlighted: null, // which index was inverted last time
@@ -5,6 +7,17 @@ let _lastRendered = {
   data: null,        // the current data
   selectedIndex: 0,  // the current selected index
 };
+
+export async function resetScreen() {
+  console.clear();
+  _lastRendered = {
+    lines: [],
+    highlighted: null,
+    root: '',
+    data: null,
+  };
+};
+
 
 // Truncate a string to the current terminal width
 function truncateToWidth(str) {
@@ -19,7 +32,7 @@ function truncateToWidth(str) {
   return body.slice(0, cols) + (hasNL ? '\n' : '');
 }
 
-export default async function renderToConsole(tree, selectedIndex) {
+export async function renderToConsole(tree, selectedIndex) {
 
   const rootNode   = tree[0];
   const bodyLines  = tree.slice(1);
