@@ -54,8 +54,21 @@ const keyMap = {
   },
   // Escape to exit
   escape: (str, key) => {
-    console.log('Escape pressed, exiting...');
+    console.log('\x1Bc'); // Clear the console and scroll buffer
+    console.log('Exiting...');
     process.exit(0);
+  },
+  // ctrl+n to add a new object
+  'Ctrl+n': async (str, key) => {
+    // Get the last item outline
+    const lastItemOutline = await fhr.getLastItemOutline(data);
+    // Add a new object to the data
+    data = await fhr.addObject(data, lastItemOutline);
+    // Write the change to the json file
+    await fhr.saveData(data);
+    // Create a new tree and render it
+    tree = await fhr.createAsciiTree(data, ['title', 'unique_id']);
+    await renderToConsole(tree, selectedIndex);
   },
   // add more key handlers here
 };
