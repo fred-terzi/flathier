@@ -28,7 +28,7 @@ const options = args.slice(1);
 const commands = {
   help: async () => await help(),
   init: async (options) => {
-    const fileName = options[0];
+    const fileName = options.join('_'); // Combine all options with underscores
     if (fileName) {
       await init(fileName);
     } else {
@@ -55,6 +55,24 @@ const commands = {
     } else {
       console.error('Error: No outline provided for add-after command.');
       process.exit(1);
+    }
+  },
+  add: async () => {
+    try {
+      const data = await loadData();
+      // Get the outline number of the last item in the data array
+      const lastItem = data[data.length - 1];
+      const lastOutline = lastItem ? lastItem.outline : '1';
+      const updatedData = await addObject(data, lastOutline);
+
+      if (updatedData) {
+        await saveData(updatedData);
+        console.log('✅ Successfully added a new item to the end of the list.');
+      } else {
+        console.error('⚠️  Failed to add a new item to the end of the list.');
+      }
+    } catch (error) {
+      console.error(`❌ Error: ${error.message}`);
     }
   },
 };

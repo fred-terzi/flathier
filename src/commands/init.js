@@ -51,7 +51,7 @@ export default async function init(fileName = 'FlatHier') {
   const mainFileName = fileName.endsWith('.fhr.json') ? fileName : `${fileName}.fhr.json`;
   const mainFilePath = path.join(root, mainFileName);
 
-  console.log(`Creating folder at: ${path.relative(process.cwd(), folderPath)}`);
+  console.log(`✅ Creating folder at: ${path.relative(process.cwd(), folderPath)}`);
   await fs.mkdir(folderPath, { recursive: true });
 
   try {
@@ -60,7 +60,7 @@ export default async function init(fileName = 'FlatHier') {
     const templateArray = JSON.parse(rawTemplateData);
 
     if (!Array.isArray(templateArray)) {
-      throw new Error('Template data is not a flat array of objects');
+      throw new Error('❌ Template data is not a flat array of objects');
     }
 
     // Save clean template with updated title only
@@ -69,7 +69,7 @@ export default async function init(fileName = 'FlatHier') {
       title: index === 0 ? fileName : item.title,
     }));
     await fs.writeFile(destinationPath, JSON.stringify(cleanedTemplate, null, 2));
-    console.log(`Wrote clean template to: ${path.relative(process.cwd(), destinationPath)}`);
+    console.log(`✅ Wrote clean template to: ${path.relative(process.cwd(), destinationPath)}`);
 
     // Create working copy with unique IDs
     const workingCopy = cleanedTemplate.map(item => ({
@@ -77,11 +77,11 @@ export default async function init(fileName = 'FlatHier') {
       unique_id: generateUniqueId(),
     }));
     await fs.writeFile(mainFilePath, JSON.stringify(workingCopy, null, 2));
-    console.log(`Created working file at: ${path.relative(process.cwd(), mainFilePath)}`);
+    console.log(`✅ Created working file at: ${path.relative(process.cwd(), mainFilePath)}`);
 
   } catch (error) {
-    console.error('Error during initialization:', error);
+    console.error('❌ Error during initialization:', error);
   }
 
-  console.log('Initialization complete.');
+  console.log('✅ Initialization complete.');
 }

@@ -4,6 +4,8 @@ export default function displayHelp() {
 Commands:
   init "<file_name>"   Initialize a new project with the given name
 
+  add   Add new item to the end of the list. The new item will use the .fhr/template.fhr.json last object.
+
   add-after <outline>   Add a new item after the specified outline. The new item will use the .fhr/template.fhr.json last object.
 
 Options:
