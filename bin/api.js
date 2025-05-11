@@ -32,4 +32,3 @@ const flathier = {
 
 export default flathier;
 
-console.log('Hello from the API!');

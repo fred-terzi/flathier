@@ -9,9 +9,6 @@ if (process.stdin.isTTY) {
   process.stdin.setRawMode(true);
 }
 
-console.log('Interactive CLI Key-Detection with Key Map Template');
-console.log('Press any key to see details or trigger mapped actions. Ctrl+C to exit.');
-
 // Normalize keys to avoid confusion between similar keys (e.g., 'n' and 'Ctrl+N')
 function normalizeKey(key) {
   if (key.ctrl) {
@@ -32,10 +29,6 @@ console.log('\x1Bc'); // Clear the console and scroll buffer
 await renderToConsole(tree, selectedIndex);
 
 
-// Function to display the current selected index
-function displaySelectedIndex() {
-  console.log(`Current selected index: ${selectedIndex}`);
-}
 
 // Updated keyMap with normalized keys
 const keyMap = {
@@ -48,11 +41,6 @@ const keyMap = {
     selectedIndex = Math.min(tree.length - 2, selectedIndex + 1); // Minus two because the first line is the root node
     renderToConsole(tree, selectedIndex);
   },
-  left: (str, key) => console.log('Arrow Left pressed'),
-  right: (str, key) => console.log('Arrow Right pressed'),
-  return: (str, key) => console.log('Enter/Return pressed'),
-  a: (str, key) => console.log('Key "a" pressed'),
-  'Ctrl+n': (str, key) => console.log('Ctrl+N pressed'),
   // Escape to exit
   escape: (str, key) => {
     console.log('Escape pressed, exiting...');
