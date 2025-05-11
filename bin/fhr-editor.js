@@ -5,14 +5,12 @@ import fhr from 'flathier';
 
 // Suppress built-in error messages and exit gracefully
 process.on('uncaughtException', (err) => {
+  process.exit(1);
+});
 
-    process.exit(1);
-  });
-  
-  process.on('unhandledRejection', (reason, promise) => {
-
-    process.exit(1);
-  });
+process.on('unhandledRejection', (reason, promise) => {
+  process.exit(1);
+});
 
 // Enable keypress events on stdin
 readline.emitKeypressEvents(process.stdin);
@@ -28,66 +26,95 @@ function normalizeKey(key) {
   return key.name;
 }
 
+// Function to create a readline interface
+function createReadlineInterface() {
+  return readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+    terminal: true,
+  });
+}
+
 // Add a selectedIndex variable to track the current selection
 let selectedIndex = 0;
+
 // Load the initial data
 let data = await fhr.loadData();
+
 // Create the initial tree
 let tree = await fhr.createAsciiTree(data, ['title', 'unique_id']);
+
 // Render the initial tree to the console
 console.log('\x1Bc'); // Clear the console and scroll buffer
-// Display the initial tree
 await renderToConsole(tree, selectedIndex);
 
-
-
-// Updated keyMap with normalized keys
+// Key handlers
 const keyMap = {
   up: (str, key) => {
-    selectedIndex = Math.max(0, selectedIndex - 1); // Decrement index, ensuring it doesn't go below 0
+    selectedIndex = Math.max(0, selectedIndex - 1);
     renderToConsole(tree, selectedIndex);
   },
   down: (str, key) => {
-    // Increment index, ensuring it doesn't exceed the length of the tree
-    selectedIndex = Math.min(tree.length - 2, selectedIndex + 1); // Minus two because the first line is the root node
+    selectedIndex = Math.min(tree.length - 2, selectedIndex + 1);
     renderToConsole(tree, selectedIndex);
   },
-  // Escape to exit
   escape: (str, key) => {
-    console.log('\x1Bc'); // Clear the console and scroll buffer
+    console.log('\x1Bc');
     console.log('Exiting...');
     process.exit(0);
   },
-  // ctrl+n to add a new object
-  'Ctrl+n': async (str, key) => {
-    // Get the last item outline
-    const lastItemOutline = await fhr.getLastItemOutline(data);
-    // Add a new object to the data
-    data = await fhr.addObject(data, lastItemOutline);
-    // Write the change to the json file
+  'Ctrl+n': async () => {
+    process.stdin.setRawMode(false);
+    const rl = createReadlineInterface();
+
+    try {
+      const title = await new Promise((resolve) => {
+        rl.question('Enter New Item Title: ', resolve);
+      });
+
+      if (!title.trim()) {
+        console.log('Title cannot be empty. Operation canceled.');
+        return;
+      }
+
+      console.log(`Entered Title: ${title}`);
+
+      const lastItemOutline = await fhr.getLastItemOutline(data);
+      data = await fhr.addObject(data, lastItemOutline, title);
+      await fhr.saveData(data);
+      tree = await fhr.createAsciiTree(data, ['title', 'unique_id']);
+      await renderToConsole(tree, selectedIndex);
+    } catch (err) {
+      console.error('Error adding item:', err);
+    } finally {
+      rl.close();
+      process.stdin.setRawMode(true);
+    }
+  },
+  delete: async (str, key) => {
+    const outline = tree[selectedIndex + 1].outline;
+    data = await fhr.deleteObject(data, outline);
     await fhr.saveData(data);
-    // Create a new tree and render it
     tree = await fhr.createAsciiTree(data, ['title', 'unique_id']);
     await renderToConsole(tree, selectedIndex);
   },
-  // add more key handlers here
+  // Add more key handlers here
 };
 
-// Default handler if key not in keyMap
-function defaultHandler(str, key) {
-  console.log('Unmapped key pressed:', { str, name: key.name, sequence: key.sequence });
-}
-
-// 2) Listen for keypress events
+// Listen for keypress events
 process.stdin.on('keypress', (str, key) => {
-  // Always exit on Ctrl+C
   if (key.ctrl && key.name === 'c') {
     console.log('Exiting...');
     process.exit(0);
   }
 
-  // Lookup handler by normalized key
   const normalizedKey = normalizeKey(key);
-  const handler = keyMap[normalizedKey] || defaultHandler;
-  handler(str, key);
+  const handler = keyMap[normalizedKey];
+
+  if (handler) {
+    Promise.resolve(handler(str, key)).catch((err) => {
+      console.error('Handler error:', err);
+      process.stdin.setRawMode(true);
+    });
+  }
 });
