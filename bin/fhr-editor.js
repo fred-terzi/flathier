@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 import readline from 'readline';
+import renderToConsole from '../src/renderers/consoleRenderer.js';
+import fhr from 'flathier';
 
 // Enable keypress events on stdin
 readline.emitKeypressEvents(process.stdin);
@@ -18,15 +20,44 @@ function normalizeKey(key) {
   return key.name;
 }
 
+// Add a selectedIndex variable to track the current selection
+let selectedIndex = 0;
+// Load the initial data
+let data = await fhr.loadData();
+// Create the initial tree
+let tree = await fhr.createAsciiTree(data, ['title', 'unique_id']);
+// Render the initial tree to the console
+console.log('\x1Bc'); // Clear the console and scroll buffer
+// Display the initial tree
+await renderToConsole(tree, selectedIndex);
+
+
+// Function to display the current selected index
+function displaySelectedIndex() {
+  console.log(`Current selected index: ${selectedIndex}`);
+}
+
 // Updated keyMap with normalized keys
 const keyMap = {
-  up:      (str, key) => console.log('Arrow Up pressed'),
-  down:    (str, key) => console.log('Arrow Down pressed'),
-  left:    (str, key) => console.log('Arrow Left pressed'),
-  right:   (str, key) => console.log('Arrow Right pressed'),
-  return:  (str, key) => console.log('Enter/Return pressed'),
-  a:       (str, key) => console.log('Key "a" pressed'),
+  up: (str, key) => {
+    selectedIndex = Math.max(0, selectedIndex - 1); // Decrement index, ensuring it doesn't go below 0
+    renderToConsole(tree, selectedIndex);
+  },
+  down: (str, key) => {
+    // Increment index, ensuring it doesn't exceed the length of the tree
+    selectedIndex = Math.min(tree.length - 2, selectedIndex + 1); // Minus two because the first line is the root node
+    renderToConsole(tree, selectedIndex);
+  },
+  left: (str, key) => console.log('Arrow Left pressed'),
+  right: (str, key) => console.log('Arrow Right pressed'),
+  return: (str, key) => console.log('Enter/Return pressed'),
+  a: (str, key) => console.log('Key "a" pressed'),
   'Ctrl+n': (str, key) => console.log('Ctrl+N pressed'),
+  // Escape to exit
+  escape: (str, key) => {
+    console.log('Escape pressed, exiting...');
+    process.exit(0);
+  },
   // add more key handlers here
 };
 

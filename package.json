@@ -13,7 +13,7 @@
     "fhr-editor": "bin/fhr-editor.js"
   },
   "exports": {
-    "./flathier": "./bin/api.js"
+    ".": "./bin/api.js"
   },
   "type": "module",
   "dependencies": {

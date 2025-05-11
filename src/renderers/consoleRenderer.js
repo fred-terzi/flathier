@@ -1,4 +1,3 @@
-
 let _lastRendered = {
   lines: [],         // array of strings (with trailing "\n")
   highlighted: null, // which index was inverted last time
@@ -9,6 +8,11 @@ let _lastRendered = {
 
 // Truncate a string to the current terminal width
 function truncateToWidth(str) {
+  if (typeof str !== 'string') {
+    console.error('truncateToWidth: Expected a string, but received:', str);
+    return '';
+  }
+
   const [cols] = process.stdout.getWindowSize();
   const hasNL = str.endsWith('\n');
   const body  = hasNL ? str.slice(0, -1) : str;
