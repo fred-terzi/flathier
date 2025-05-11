@@ -2,6 +2,7 @@
 import readline from 'readline';
 import {renderToConsole, resetScreen} from '../src/renderers/consoleRenderer.js';
 import fhr from 'flathier';
+import { handleAddItem } from '../src/cliHandlers/addHandler.js';
 
 // Suppress built-in error messages and exit gracefully
 process.on('uncaughtException', (err) => {
@@ -64,43 +65,10 @@ const keyMap = {
     process.exit(0);
   },
   'Ctrl+n': async () => {
-    process.stdin.setRawMode(false);
-    const rl = createReadlineInterface();
-
-    try {
-      const title = await new Promise((resolve) => {
-        rl.question('Enter New Item Title: ', resolve);
-      });
-
-      if (!title.trim()) {
-        console.log('⚠️ Title cannot be empty. Operation canceled.');
-        return;
-      }
-
-      console.log(`Entered Title: ${title}`);
-
-      const lastItemOutline = await fhr.getLastItemOutline(data);
-      data = await fhr.addObject(data, lastItemOutline, title);
-      // Get new last item outline
-        const newLastItemOutline = await fhr.getLastItemOutline(data);
-      // set the title of the new item
-      const newItem = data.find((item) => item.outline === newLastItemOutline);
-        newItem.title = title;
-      await fhr.saveData(data);
-      tree = await fhr.createAsciiTree(data, ['title', 'unique_id']);
-      resetScreen();
-      // Increment selectedIndex to the new item
-      selectedIndex = data.findIndex((item) => item.outline === newLastItemOutline) - 1;
-      await renderToConsole(tree, selectedIndex);
-    } catch (err) {
-      console.error('❌ Error adding item:', err);
-    } finally {
-        rl.close();
-        readline.emitKeypressEvents(process.stdin); // Re-enable keypress events
-        process.stdin.setRawMode(true);             // Re-enable raw mode
-        process.stdin.resume();                     // Keep stdin from closing
-    }
-      
+    const result = await handleAddItem(data, tree, selectedIndex, renderToConsole, resetScreen, fhr);
+    data = result.data;
+    tree = result.tree;
+    selectedIndex = result.selectedIndex;
   },
   delete: async (str, key) => {
     const outline = tree[selectedIndex + 1].outline;
