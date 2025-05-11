@@ -44,6 +44,13 @@ async function main() {
     // Delete object with outline 1
     await fhr.deleteObject(data, '1');
     console.log('Data after deleting object:', data);
+
+    // Call the createAsciiTree function
+
+    // Create a list of fields to include in the ASCII tree titles
+    const fieldsToInclude = ['title', 'unique_id'];
+    const asciiTree = await fhr.createAsciiTree(data, fieldsToInclude);
+    console.log('ASCII Tree:', asciiTree);
 }
 
 main();

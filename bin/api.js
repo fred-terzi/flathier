@@ -1,4 +1,4 @@
-
+// Core functions
 import init from '../src/commands/init.js';
 import addObject from '../src/core/addObject.js';
 import deleteObject from '../src/core/deleteObject.js';
@@ -6,6 +6,7 @@ import demote from '../src/core/demote.js';
 import promote from '../src/core/promote.js';
 import moveDown from '../src/core/moveDown.js';
 import moveUp from '../src/core/moveUp.js';
+import createAsciiTree from '../src/core/asciiTree.js';
 
 // Data handling functions
 import { loadData, saveData  } from '../src/dataHandler.js';
@@ -25,7 +26,8 @@ const flathier = {
   demote,
   promote,
   moveDown,
-  moveUp
+  moveUp,
+  createAsciiTree,
 };
 
 export default flathier;
