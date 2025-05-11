@@ -2,7 +2,7 @@
 process.env.FHR_ROOT_DIR = process.cwd(); // Sets it to the current working directory
 
 import fhr from './bin/api.js';
-import { renderToConsole } from './src/renderers/consoleRenderer.js';
+import renderToConsole from './src/renderers/consoleRenderer.js';
 
 const projectName = "Test 1";
 

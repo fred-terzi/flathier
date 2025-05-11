@@ -15,7 +15,7 @@ function truncateToWidth(str) {
   return body.slice(0, cols) + (hasNL ? '\n' : '');
 }
 
-export async function renderToConsole(tree, selectedIndex) {
+export default async function renderToConsole(tree, selectedIndex) {
 
   const rootNode   = tree[0];
   const bodyLines  = tree.slice(1);
@@ -113,17 +113,12 @@ process.on('SIGWINCH', async () => {
   };
   console.log('Resize detected.');
 
-  try {
-    const ds = getDataService();
-    await ds.loadData();
-    const data = ds.getData();
 
-    if (data) {
-      renderToConsole(data, 0);
-    } else {
-      console.error('No data available to render.');
-    }
-  } catch (error) {
-    console.error('Failed to reload data after resize:', error.message);
+
+  if (tree) {
+    renderToConsole(tree, 0);
+  } else {
+    console.error('No tree available to render.');
   }
+
 });
