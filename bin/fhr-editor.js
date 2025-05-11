@@ -93,9 +93,12 @@ const keyMap = {
     } catch (err) {
       console.error('❌ Error adding item:', err);
     } finally {
-      rl.close();
-      process.stdin.setRawMode(true);
+        rl.close();
+        readline.emitKeypressEvents(process.stdin); // Re-enable keypress events
+        process.stdin.setRawMode(true);             // Re-enable raw mode
+        process.stdin.resume();                     // Keep stdin from closing
     }
+      
   },
   delete: async (str, key) => {
     const outline = tree[selectedIndex + 1].outline;
