@@ -3,6 +3,7 @@ import readline from 'readline';
 import {renderToConsole, resetScreen} from '../src/renderers/consoleRenderer.js';
 import fhr from 'flathier';
 import { handleAddItem } from '../src/cliHandlers/addHandler.js';
+import { handleDeleteItem } from '../src/cliHandlers/deleteHandler.js';
 
 // Suppress built-in error messages and exit gracefully
 process.on('uncaughtException', (err) => {
@@ -71,18 +72,20 @@ const keyMap = {
     selectedIndex = result.selectedIndex;
   },
   backspace: async (str, key) => {
-    const outline = data[selectedIndex + 1].outline;
-    console.log('Deleting item with outline:', outline);
-    // Call the deleteObject function from fhr
-    const updatedData = await fhr.deleteObject(data, outline);
-    // Save the updated data
-    await fhr.saveData(updatedData);
-    // Recreate the tree
-    tree = await fhr.createAsciiTree(updatedData, ['title', 'unique_id']);
-    // Update the selectedIndex
-    selectedIndex = Math.max(0, selectedIndex - 1);
-    // Render the updated tree to the console
+    const result = await handleDeleteItem(data, selectedIndex);
+    data = result.data;
+    tree = result.tree;
     resetScreen();
+    selectedIndex = Math.max(0, selectedIndex - 1);
+    // Re-render the tree after deletion
+    await renderToConsole(tree, selectedIndex);
+  },
+  delete: async (str, key) => {
+    const result = await handleDeleteItem(data, selectedIndex);
+    data = result.data;
+    tree = result.tree;
+    resetScreen();
+    selectedIndex = Math.max(0, selectedIndex - 1);
     await renderToConsole(tree, selectedIndex);
   },
   // Add more key handlers here
