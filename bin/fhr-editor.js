@@ -5,7 +5,6 @@ import { renderToConsole, resetScreen } from '../src/renderers/consoleRenderer.j
 import fhr from 'flathier';
 import { handleAddItem } from '../src/cliHandlers/addHandler.js';
 import { handleDeleteItem } from '../src/cliHandlers/deleteHandler.js';
-import { error } from 'console';
 
 // ──────────────────────────────────────────────────────────
 // Graceful error handling: suppress built-in messages and exit
@@ -211,7 +210,7 @@ const keyMap = {
     resetScreen();
     await renderToConsole(tree, selectedIndex);
   },
-  // (Extend with more handlers like left, right, etc.)
+  // (Extend with more handlers as needed)
 };
 
 
