@@ -144,6 +144,8 @@ const keyMap = {
     // Demote in memory using return value
     const newData = await fhr.demote(data, outlineToDemote);
     data = newData;
+
+    fhr.setData(data);        // ← populate cachedData
     // Persist change
     await fhr.saveData(data);
     // Rebuild the ASCII tree
@@ -161,6 +163,8 @@ const keyMap = {
     // Promote in memory using return value
     const newData = await fhr.promote(data, outlineToPromote);
     data = newData;
+    fhr.setData(data);        // ← populate cachedData
+
     // Persist change
     await fhr.saveData(data);
     // Rebuild the ASCII tree
@@ -251,6 +255,8 @@ const keyMap = {
         // Update the title
         if (data[selectedIndex + 1]) {
           data[selectedIndex + 1].title = state.editBuffer.trim() || data[selectedIndex + 1].title;
+          fhr.setData(data);        // ← populate cachedData
+          // Persist change
           fhr.saveData(data);
           fhr.createAsciiTree(data, ['title', 'unique_id']).then(newTree => {
             tree = newTree;
@@ -321,6 +327,9 @@ function keypressHandler(str, key) {
   if (state.mode === 'edit') {
     if (key.name === 'escape') {
       exitEdit();
+      // Turn off raw mode and show cursor
+      process.stdout.write('\x1B[?25h'); // show cursor
+      process.stdin.setRawMode(false);
       return;
     }
 
