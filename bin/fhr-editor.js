@@ -159,6 +159,23 @@ const keyMap = {
     resetScreen();
     await renderToConsole(tree, selectedIndex);
   },
+  // Left arrow for promote
+  left: async () => {
+    const uidToPromote = data[selectedIndex + 1].unique_id;
+    const outlineToPromote = data[selectedIndex + 1].outline;
+    // Promote in memory using return value
+    const newData = await fhr.promote(data, outlineToPromote);
+    data = newData;
+    // Persist change
+    await fhr.saveData(data);
+    // Rebuild the ASCII tree
+    tree = await fhr.createAsciiTree(data, ['title', 'unique_id']);
+
+    selectedIndex = Math.max(0, selectedIndex);
+
+    resetScreen();
+    await renderToConsole(tree, selectedIndex);
+  },
   // (Extend with more handlers like left, right, etc.)
 };
 
