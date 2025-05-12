@@ -9,7 +9,12 @@ export async function handleAddItem(data, tree, selectedIndex, renderToConsole, 
 
   try {
     const title = await new Promise((resolve) => {
-      rl.question('Enter New Item Title: ', resolve);
+    // Move cursor to the second-to-last line and clear it
+    const [, h] = process.stdout.getWindowSize();
+    const row = h - 1; // Second-to-last line
+    process.stdout.write(`\x1B[${row};0H\x1B[K`); // Clear the line
+    process.stdout.write('\x1B[?25h'); // Show cursor
+    rl.question('\x1b[34mEnter New Item Title: \x1b[0m', resolve);
     });
 
     if (!title.trim()) {
@@ -17,7 +22,6 @@ export async function handleAddItem(data, tree, selectedIndex, renderToConsole, 
       return { data, tree, selectedIndex };
     }
 
-    console.log(`Entered Title: ${title}`);
 
     const lastItemOutline = await fhr.getLastItemOutline(data);
     data = await fhr.addObject(data, lastItemOutline, title);
@@ -39,8 +43,7 @@ export async function handleAddItem(data, tree, selectedIndex, renderToConsole, 
     return { data, tree, selectedIndex };
   } finally {
     rl.close();
-    readline.emitKeypressEvents(process.stdin);
-    process.stdin.setRawMode(true);
-    process.stdin.resume();
+    process.stdin.resume(); // ✅ Keep stdin open
+
   }
 }

@@ -1,34 +1,64 @@
 #!/usr/bin/env node
+
 import readline from 'readline';
-import {renderToConsole, resetScreen} from '../src/renderers/consoleRenderer.js';
+import { renderToConsole, resetScreen } from '../src/renderers/consoleRenderer.js';
 import fhr from 'flathier';
 import { handleAddItem } from '../src/cliHandlers/addHandler.js';
 import { handleDeleteItem } from '../src/cliHandlers/deleteHandler.js';
 
-// Suppress built-in error messages and exit gracefully
-process.on('uncaughtException', (err) => {
-  process.exit(1);
-});
+// ──────────────────────────────────────────────────────────
+// Graceful error handling: suppress built-in messages and exit
+// ──────────────────────────────────────────────────────────
+process.on('uncaughtException', () => process.exit(1));
+process.on('unhandledRejection', () => process.exit(1));
 
-process.on('unhandledRejection', (reason, promise) => {
-  process.exit(1);
-});
 
-// Enable keypress events on stdin
+// ──────────────────────────────────────────────────────────
+// Enable keypress events on stdin (raw mode if tty)
+// ──────────────────────────────────────────────────────────
 readline.emitKeypressEvents(process.stdin);
 if (process.stdin.isTTY) {
   process.stdin.setRawMode(true);
 }
 
-// Normalize keys to avoid confusion between similar keys (e.g., 'n' and 'Ctrl+N')
-function normalizeKey(key) {
-  if (key.ctrl) {
-    return `Ctrl+${key.name}`;
-  }
-  return key.name;
+
+// ──────────────────────────────────────────────────────────
+// EDIT MODE UTILITIES
+// ──────────────────────────────────────────────────────────
+
+/**
+ * Enter “edit” mode: clear buffer, detach navigation listener, show cursor.
+ */
+function startEdit() {
+  state.mode = 'edit';
+  state.editBuffer = '';
+  detachKeypressListener();
+  process.stdout.write('\x1B[?25h'); // show cursor
 }
 
-// Function to create a readline interface
+/**
+ * Exit “edit” mode: hide cursor, re-attach navigation listener, re-enable raw mode.
+ */
+function exitEdit() {
+  state.mode = 'navigate';
+  state.editBuffer = '';
+  attachKeypressListener();
+  process.stdout.write('\x1B[?25l'); // hide cursor
+  process.stdin.setRawMode(true);
+}
+
+/**
+ * Normalize key objects into consistent strings (e.g. Ctrl+n).
+ * @param {{ ctrl: boolean, name: string }} key
+ * @returns {string}
+ */
+function normalizeKey(key) {
+  return key.ctrl ? `Ctrl+${key.name}` : key.name;
+}
+
+/**
+ * Factory for readline interfaces (unused in current CLI flow).
+ */
 function createReadlineInterface() {
   return readline.createInterface({
     input: process.stdin,
@@ -37,74 +67,169 @@ function createReadlineInterface() {
   });
 }
 
-// Add a selectedIndex variable to track the current selection
+
+// ──────────────────────────────────────────────────────────
+// STATE & INITIAL RENDER
+// ──────────────────────────────────────────────────────────
+
 let selectedIndex = 0;
+const state = {
+  mode: 'navigate',   // 'navigate' or 'edit'
+  editBuffer: '',
+};
 
-// Load the initial data
-let data = await fhr.loadData();
+let data    = await fhr.loadData();
+let tree    = await fhr.createAsciiTree(data, ['title', 'unique_id']);
 
-// Create the initial tree
-let tree = await fhr.createAsciiTree(data, ['title', 'unique_id']);
-
-// Render the initial tree to the console
+// Clear screen and draw initial tree
 resetScreen();
 await renderToConsole(tree, selectedIndex);
 
-// Key handlers
+
+// ──────────────────────────────────────────────────────────
+// NAVIGATION & EDIT HANDLERS
+// ──────────────────────────────────────────────────────────
+
 const keyMap = {
-  up: (str, key) => {
-    selectedIndex = Math.max(0, selectedIndex - 1);
-    renderToConsole(tree, selectedIndex);
-  },
-  down: (str, key) => {
-    selectedIndex = Math.min(tree.length - 2, selectedIndex + 1);
-    renderToConsole(tree, selectedIndex);
-  },
-  escape: (str, key) => {
-    console.log('\x1Bc');
+  up:    () => { selectedIndex = Math.max(0, selectedIndex - 1); renderToConsole(tree, selectedIndex); },
+  down:  () => { selectedIndex = Math.min(tree.length - 2, selectedIndex + 1); renderToConsole(tree, selectedIndex); },
+  escape: () => {
+    console.clear();
     console.log('Exiting...');
     process.exit(0);
   },
   'Ctrl+n': async () => {
-    const result = await handleAddItem(data, tree, selectedIndex, renderToConsole, resetScreen, fhr);
-    data = result.data;
-    tree = result.tree;
+    // Trigger “add item” flow
+    state.mode = 'edit';
+    startEdit();
+
+    const result = await handleAddItem(
+      data,
+      tree,
+      selectedIndex,
+      renderToConsole,
+      resetScreen,
+      fhr
+    );
+
+    exitEdit();
+
+    // Update local state from result
+    data          = result.data;
+    tree          = result.tree;
     selectedIndex = result.selectedIndex;
+    state.mode    = 'navigate';
   },
-  backspace: async (str, key) => {
+  backspace: async () => {
+    // Trigger “delete item” flow
     const result = await handleDeleteItem(data, selectedIndex);
-    data = result.data;
-    tree = result.tree;
-    resetScreen();
+
+    data          = result.data;
+    tree          = result.tree;
     selectedIndex = Math.max(0, selectedIndex - 1);
-    // Re-render the tree after deletion
+
+    resetScreen();
     await renderToConsole(tree, selectedIndex);
   },
-  delete: async (str, key) => {
+  delete: async () => {
+    // Same as backspace
     const result = await handleDeleteItem(data, selectedIndex);
-    data = result.data;
-    tree = result.tree;
-    resetScreen();
+
+    data          = result.data;
+    tree          = result.tree;
     selectedIndex = Math.max(0, selectedIndex - 1);
+
+    resetScreen();
     await renderToConsole(tree, selectedIndex);
   },
-  // Add more key handlers here
+  // (Extend with more handlers like left, right, etc.)
 };
 
-// Listen for keypress events
-process.stdin.on('keypress', (str, key) => {
+
+// ──────────────────────────────────────────────────────────
+// KEYPRESS LISTENER MANAGEMENT
+// ──────────────────────────────────────────────────────────
+
+let isKeypressListenerAttached = false;
+
+/**
+ * Attach the primary keypress handler if not already attached.
+ */
+function attachKeypressListener() {
+  if (!isKeypressListenerAttached) {
+    process.stdin.on('keypress', keypressHandler);
+    isKeypressListenerAttached = true;
+  }
+}
+
+/**
+ * Detach the primary keypress handler if attached.
+ */
+function detachKeypressListener() {
+  if (isKeypressListenerAttached) {
+    process.stdin.off('keypress', keypressHandler);
+    isKeypressListenerAttached = false;
+  }
+}
+
+/**
+ * Central keypress handler: routes to edit-mode logic or navigation handlers.
+ * @param {string} str  The raw character string.
+ * @param {{name: string, ctrl?: boolean}} key The parsed key object.
+ */
+function keypressHandler(str, key) {
+  // EDIT MODE: capture printable chars, backspace, return, or exit
+  if (state.mode === 'edit') {
+    if (key.name === 'escape') {
+      exitEdit();
+      return;
+    }
+
+    if (key.name === 'backspace') {
+      // Remove last char from buffer, redraw prompt line
+      state.editBuffer = state.editBuffer.slice(0, -1);
+      const [, height] = process.stdout.getWindowSize();
+      const row = height - 1; 
+      process.stdout.write(
+        `\x1b[${row};1H\x1b[2K\x1b[34mEnter Title:\x1b[0m ${state.editBuffer}`
+      );
+      return;
+    }
+
+    if (key.name === 'return') {
+      console.log(`\nFinal input: ${state.editBuffer}`);
+      exitEdit();
+      return;
+    }
+
+    // Append printable character
+    if (str) {
+      state.editBuffer += str;
+      process.stdout.write(str);
+    }
+
+    return; // stop further processing
+  }
+
+  // GLOBAL CTRL+C to exit
   if (key.ctrl && key.name === 'c') {
     console.log('Exiting...');
     process.exit(0);
   }
 
-  const normalizedKey = normalizeKey(key);
-  const handler = keyMap[normalizedKey];
-
+  // NAVIGATION MODE: lookup in keyMap
+  const normalized = normalizeKey(key);
+  const handler    = keyMap[normalized];
   if (handler) {
     Promise.resolve(handler(str, key)).catch((err) => {
       console.error('❌ Handler error:', err);
       process.stdin.setRawMode(true);
     });
   }
-});
+}
+
+
+// ──────────────────────────────────────────────────────────
+// Initialize listener
+// ──────────────────────────────────────────────────────────
+attachKeypressListener();
