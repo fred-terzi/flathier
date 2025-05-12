@@ -231,7 +231,7 @@ const keyMap = {
     // Show prompt at bottom
     const [, height] = process.stdout.getWindowSize();
     const row = height - 1;
-    process.stdout.write(`\x1b[${row};1H\x1b[2K\x1b[34mEdit Title:\x1b[0m`);
+    process.stdout.write(`\x1b[${row};1H\x1b[2K\x1b[34mEdit Title: \x1b[0m`);
 
     // Handler for edit mode keypresses
     function editTitleKeypressHandler(str, key) {
