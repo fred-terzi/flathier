@@ -14,11 +14,12 @@ const __dirname = path.dirname(__filename);
 
 /**
  * Finds the root directory of the project by locating the nearest package.json file.
- * @param {string} [start=__dirname] - The starting directory for the search.
- * @returns {Promise<string>} The path to the project root directory.
+ * Starts from process.cwd() so that “root” is always where the user invoked the command.
+ * @param {string} [start=process.cwd()] - The directory to start searching from.
+ * @returns {Promise<string>} The root directory path.
  * @throws Will throw an error if package.json is not found.
  */
-async function findProjectRoot(start = __dirname) {
+async function findProjectRoot(start = process.cwd()) {
   let dir = start;
   while (true) {
     const maybePkg = path.join(dir, 'package.json');
@@ -37,27 +38,34 @@ async function findProjectRoot(start = __dirname) {
 
 /**
  * Initializes the project by creating necessary directories and files.
- * @param {string} [fileName='fhr'] - The base name for the main FHR file.
+ * @param {string} [fileName='FlatHier'] - The base name for the main FHR file.
  * @returns {Promise<void>}
  */
 export default async function init(fileName = 'FlatHier') {
+  // Root will now be the cwd where the user ran `npx fhr init`
   const root = await findProjectRoot();
-    // Sanitize the file name to replace spaces with underscores
-    fileName = sanitizeSpaces(fileName);
-  // Set paths
-  const folderPath = path.join(root, '.fhr');
-  const templatePath = path.join(root, 'src', 'fhrTemplates', 'fhrTemplate.json');
+
+  // Sanitize the file name to replace spaces with underscores
+  fileName = sanitizeSpaces(fileName);
+
+  // Paths relative to project root
+  const folderPath      = path.join(root, '.fhr');
   const destinationPath = path.join(folderPath, 'template.fhr.json');
-  const mainFileName = fileName.endsWith('.fhr.json') ? fileName : `${fileName}.fhr.json`;
-  const mainFilePath = path.join(root, mainFileName);
+  const mainFileName    = fileName.endsWith('.fhr.json')
+    ? fileName
+    : `${fileName}.fhr.json`;
+  const mainFilePath    = path.join(root, mainFileName);
+
+  // Path to the built-in template inside this package
+  const templatePath = path.join(__dirname, '../fhrTemplates/fhrTemplate.json');
 
   console.log(`✅ Creating folder at: ${path.relative(process.cwd(), folderPath)}`);
   await fs.mkdir(folderPath, { recursive: true });
 
   try {
-    // Read and parse the base template
+    // Read and parse the base template from flathier's own templates directory
     const rawTemplateData = await fs.readFile(templatePath, 'utf-8');
-    const templateArray = JSON.parse(rawTemplateData);
+    const templateArray   = JSON.parse(rawTemplateData);
 
     if (!Array.isArray(templateArray)) {
       throw new Error('❌ Template data is not a flat array of objects');
