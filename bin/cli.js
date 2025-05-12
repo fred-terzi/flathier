@@ -97,15 +97,7 @@ if (args.length === 0) {
       }
     },
     editor: async () => {
-      const { spawn } = await import('child_process');
-      const editorProcess = spawn('node', ['./bin/fhr-editor.js'], {
-        stdio: 'inherit', // Inherit stdio to allow interaction with the terminal
-        shell: true, // Use shell to ensure compatibility with different environments
-      });
-    
-      editorProcess.on('close', (code) => {
-
-      });
+      console.log('Run `fhr-editor` to launch the editor');
     },
   };
 
