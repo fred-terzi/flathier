@@ -1,5 +1,3 @@
-
-
 let _lastRendered = {
   lines: [],         // array of strings (with trailing "\n")
   highlighted: null, // which index was inverted last time
@@ -32,7 +30,8 @@ function truncateToWidth(str) {
   return body.slice(0, cols) + (hasNL ? '\n' : '');
 }
 
-export async function renderToConsole(tree, selectedIndex) {
+export async function renderToConsole(tree, selectedIndex, errorMessage) {
+
 
   const rootNode   = tree[0];
   const bodyLines  = tree.slice(1);
@@ -74,6 +73,13 @@ export async function renderToConsole(tree, selectedIndex) {
   // Render shortcuts bar (you can diff it too, but it rarely changes size)
   renderShortcuts();
 
+  // If there is an error message, display it in the second to last line
+  if (errorMessage) {
+    const [width, height] = process.stdout.getWindowSize();
+    moveCursor(height - 1, 1);
+    process.stdout.write(`\x1b[31m${errorMessage.slice(0, width).padEnd(width, ' ')}\x1b[0m`);
+  }
+
   // Save for next diff
   _lastRendered.lines       = visible;
   _lastRendered.highlighted = toHighlight;
@@ -96,7 +102,7 @@ function invertWrite(line) {
 }
 
 function renderShortcuts() {
-  const shortcuts = "↑↓ Nav | ↵ Edit Title | Esc: Quit | ← → Promote/Demote | Shift + ↑↓ Move Item | r: Refresh";
+  const shortcuts = "↑↓ Nav | ↵ Edit Title | Esc: Quit | ← → Promote/Demote | Shift + ↑↓ Move Item | Del: Delete Item";
   const [width, height] = process.stdout.getWindowSize();
 
   // Clear the second-to-last and last lines before rendering the shortcuts bar
