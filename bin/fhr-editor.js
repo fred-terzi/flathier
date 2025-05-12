@@ -87,28 +87,6 @@ await renderToConsole(tree, selectedIndex);
 const keyMap = {
   up:    () => { selectedIndex = Math.max(0, selectedIndex - 1); renderToConsole(tree, selectedIndex); },
   down:  () => { selectedIndex = Math.min(tree.length - 2, selectedIndex + 1); renderToConsole(tree, selectedIndex); },
-  'Shift+up': async () => {
-    // Move item up
-    const outline = data[selectedIndex].outline;
-    const newData = await fhr.moveUp(data, outline);
-    data = newData;
-    await fhr.saveData(data);
-    tree = await fhr.createAsciiTree(data, ['title', 'unique_id']);
-    selectedIndex = Math.max(0, selectedIndex - 1);
-    resetScreen();
-    await renderToConsole(tree, selectedIndex);
-  },
-  'Shift+down': async () => {
-    // Move item down
-    const outline = data[selectedIndex].outline;
-    const newData = await fhr.moveDown(data, outline);
-    data = newData;
-    await fhr.saveData(data);
-    tree = await fhr.createAsciiTree(data, ['title', 'unique_id']);
-    selectedIndex = Math.min(tree.length - 2, selectedIndex + 1);
-    resetScreen();
-    await renderToConsole(tree, selectedIndex);
-  },
   escape: () => {
     console.clear();
     console.log('Exiting...');
@@ -194,18 +172,46 @@ const keyMap = {
     await renderToConsole(tree, selectedIndex);
   },
   // shift + up for move up
-  'shift+up': async () => {
+  'Shift+up': async () => {
+    // If selected item is one after root do nothing
+    if (selectedIndex === 0) {
+      return;
+    }
     const uidToMoveUp = data[selectedIndex + 1].unique_id;
     const outlineToMoveUp = data[selectedIndex + 1].outline;
     // Move up in memory using return value
     const newData = await fhr.moveUp(data, outlineToMoveUp);
     data = newData;
+    fhr.setData(data);        // ← populate cachedData
     // Persist change
     await fhr.saveData(data);
     // Rebuild the ASCII tree
     tree = await fhr.createAsciiTree(data, ['title', 'unique_id']);
 
-    selectedIndex = Math.max(0, selectedIndex);
+    // Find index of moved item
+    const movedItemIndex = data.findIndex(item => item.unique_id === uidToMoveUp);
+    selectedIndex = Math.max(0, movedItemIndex - 1);
+
+    resetScreen();
+    await renderToConsole(tree, selectedIndex);
+  },
+  // shift + down for move down
+  'Shift+down': async () => {
+
+    const uidToMoveDown = data[selectedIndex + 1].unique_id;
+    const outlineToMoveDown = data[selectedIndex + 1].outline;
+    // Move down in memory using return value
+    const newData = await fhr.moveDown(data, outlineToMoveDown);
+    data = newData;
+    fhr.setData(data);        // ← populate cachedData
+    // Persist change
+    await fhr.saveData(data);
+    // Rebuild the ASCII tree
+    tree = await fhr.createAsciiTree(data, ['title', 'unique_id']);
+
+    // Find index of moved item
+    const movedItemIndex = data.findIndex(item => item.unique_id === uidToMoveDown);
+    selectedIndex = Math.max(0, movedItemIndex - 1);
 
     resetScreen();
     await renderToConsole(tree, selectedIndex);

@@ -9,7 +9,7 @@ import moveUp from '../src/core/moveUp.js';
 import createAsciiTree from '../src/core/asciiTree.js';
 
 // Data handling functions
-import { loadData, saveData  } from '../src/dataHandler.js';
+import { loadData, saveData, setData  } from '../src/dataHandler.js';
 
 // Utility functions
 import getLastItemOutline from '../src/utils/getLastItemOutline.js';
@@ -28,6 +28,7 @@ const flathier = {
   moveDown,
   moveUp,
   createAsciiTree,
+  setData
 };
 
 export default flathier;
