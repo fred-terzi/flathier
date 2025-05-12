@@ -8,7 +8,7 @@
     "start": "NO_PROGRESS_BAR=1 node your-cli.js"
   },
   "author": "Joseph Terzi",
-  "license": "MIT",
+  "license": "AGPL-3.0-only",
   "bin": {
     "fhr": "bin/cli.js",
     "fhr-editor": "bin/fhr-editor.js"
