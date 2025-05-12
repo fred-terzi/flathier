@@ -142,6 +142,23 @@ const keyMap = {
     resetScreen();
     await renderToConsole(tree, selectedIndex);
   },
+  // Right arrow for demote
+  right: async () => {
+    const uidToDemote = data[selectedIndex + 1].unique_id;
+    const outlineToDemote = data[selectedIndex + 1].outline;
+    // Demote in memory using return value
+    const newData = await fhr.demote(data, outlineToDemote);
+    data = newData;
+    // Persist change
+    await fhr.saveData(data);
+    // Rebuild the ASCII tree
+    tree = await fhr.createAsciiTree(data, ['title', 'unique_id']);
+
+    selectedIndex = Math.max(0, selectedIndex);
+
+    resetScreen();
+    await renderToConsole(tree, selectedIndex);
+  },
   // (Extend with more handlers like left, right, etc.)
 };
 
