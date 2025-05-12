@@ -5,6 +5,7 @@ import { renderToConsole, resetScreen } from '../src/renderers/consoleRenderer.j
 import fhr from 'flathier';
 import { handleAddItem } from '../src/cliHandlers/addHandler.js';
 import { handleDeleteItem } from '../src/cliHandlers/deleteHandler.js';
+import { error } from 'console';
 
 // ──────────────────────────────────────────────────────────
 // Graceful error handling: suppress built-in messages and exit
@@ -127,15 +128,14 @@ const keyMap = {
   },
   delete: async () => {
     // Same as backspace
-    const result = await handleDeleteItem(data, selectedIndex);
+    const result = await handleDeleteItem(data, selectedIndex, errorMessage);
 
     data          = result.data;
     tree          = result.tree;
-    errorMessage = result.errorMessage;
     selectedIndex = Math.max(0, selectedIndex - 1);
 
     resetScreen();
-    await renderToConsole(tree, selectedIndex, errorMessage);
+    await renderToConsole(tree, selectedIndex);
   },
   // Right arrow for demote
   right: async () => {

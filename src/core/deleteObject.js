@@ -12,11 +12,6 @@ import computeOutlines from '../utils/computeOutlines.js';
  * @returns {{ data: Array<Object>, selectedIndex: number|null } | void}
  */
 export default function deleteObject(data, outlineNumber) {
-  // Add a condition to prevent deletion if there are only two objects left
-  if (data.length <= 2) {
-    console.error('⚠️  Cannot delete items when only two objects remain in the data.');
-    return;
-  }
 
   // Find the index of the object with the given outline number
   const selectedIndex = data.findIndex(item => item.outline === outlineNumber);
