@@ -3,18 +3,16 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname  = path.dirname(__filename);
 
-let cachedData = null;
+let cachedData     = null;
 let cachedFilePath = null;
 
 /**
  * Finds the root directory of the project by locating the nearest package.json file.
- * @param {string} [start=__dirname] - The directory to start searching from.
- * @returns {Promise<string>} The root directory path.
- * @throws Will throw an error if package.json is not found.
+ * Starts at process.cwd(), so root is where the user ran `fhr`, not where this module lives.
  */
-async function findProjectRoot(start = __dirname) {
+async function findProjectRoot(start = process.cwd()) {
   let dir = start;
   while (true) {
     const maybePkg = path.join(dir, 'package.json');
@@ -23,25 +21,30 @@ async function findProjectRoot(start = __dirname) {
       return dir;
     } catch {
       const parent = path.dirname(dir);
-      if (parent === dir) throw new Error('package.json not found');
+      if (parent === dir) {
+        throw new Error('package.json not found');
+      }
       dir = parent;
     }
   }
 }
 
 /**
- * Finds the .fhr.json file in the root directory.
- * @returns {Promise<string>} The path to the .fhr.json file.
- * @throws Will throw an error if no such file is found.
+ * Finds the .fhr.json file by looking only in the project root.
  */
 async function findFhrFile() {
   if (cachedFilePath) return cachedFilePath;
 
-  const root = await findProjectRoot();
+  const root = await findProjectRoot();    // starts at process.cwd()
+
+  // Look for any *.fhr.json file in the root folder
   const files = await fs.readdir(root);
   const fhrFile = files.find(f => f.endsWith('.fhr.json'));
   if (!fhrFile) {
-    console.warn('❌ No .fhr.json file found in root directory.\nUsage: fhr init "<file_name>"');
+    console.warn(
+      '❌ No .fhr.json file found in project root.\n' +
+      '    Run `npx fhr init "<Name>"` to create one.'
+    );
     return null;
   }
 
@@ -49,46 +52,27 @@ async function findFhrFile() {
   return cachedFilePath;
 }
 
-/**
- * Loads the .fhr.json file into memory and caches its content.
- * This must be called before using getData().
- * @returns {Promise<Object|Array>} The parsed JSON data.
- */
+
 export async function loadData() {
   const filePath = await findFhrFile();
   if (!filePath) {
-    throw new Error('No .fhr.json file found in the root directory.');
+    throw new Error('No .fhr.json file found in your project.');
   }
   const raw = await fs.readFile(filePath, 'utf-8');
-  cachedData = JSON.parse(raw);
+  cachedData     = JSON.parse(raw);
+  cachedFilePath = filePath;
   return cachedData;
 }
 
-/**
- * Gets the in-memory copy of the data.
- * Must call loadData() before using this function.
- * @returns {Object|Array} The in-memory JSON data.
- * @throws Will throw an error if data has not been loaded yet.
- */
 export function getData() {
   if (!cachedData) throw new Error('Data not loaded. Call loadData() first.');
   return cachedData;
 }
 
-/**
- * Replaces the in-memory copy of the data.
- * This does not persist to disk until saveData() is called.
- * @param {Object|Array} newData - The new data to cache.
- */
 export function setData(newData) {
   cachedData = newData;
 }
 
-/**
- * Writes the in-memory data back to the .fhr.json file.
- * @returns {Promise<void>}
- * @throws Will throw if data or file path has not been initialized.
- */
 export async function saveData() {
   if (!cachedData || !cachedFilePath) {
     throw new Error('No data or file path to save.');
@@ -97,10 +81,6 @@ export async function saveData() {
   await fs.writeFile(cachedFilePath, json, 'utf-8');
 }
 
-/**
- * Reloads the .fhr.json file from disk, replacing the in-memory cache.
- * @returns {Promise<Object|Array>} The freshly loaded data.
- */
 export async function refreshData() {
   return await loadData();
 }
