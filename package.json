@@ -18,8 +18,5 @@
   },
   "type": "module",
   "dependencies": {
-  },
-  "devDependencies": {
-    "vitest": "^0.34.0"
   }
 }
