@@ -216,6 +216,71 @@ const keyMap = {
     resetScreen();
     await renderToConsole(tree, selectedIndex);
   },
+  // Enter key for editing the selected item's title
+  'return': async () => {
+    // Enter edit mode and prompt for new title
+    state.mode = 'edit';
+    state.editBuffer = '';
+    detachKeypressListener();
+    process.stdout.write('\x1B[?25h'); // show cursor
+
+    // Show prompt at bottom
+    const [, height] = process.stdout.getWindowSize();
+    const row = height - 1;
+    process.stdout.write(`\x1b[${row};1H\x1b[2K\x1b[34mEdit Title:\x1b[0m`);
+
+    // Handler for edit mode keypresses
+    function editTitleKeypressHandler(str, key) {
+      if (key.name === 'escape') {
+        process.stdout.write('\nEdit cancelled.\n');
+        process.stdout.write('\x1B[?25l'); // hide cursor
+        process.stdin.off('keypress', editTitleKeypressHandler);
+        attachKeypressListener();
+        state.mode = 'navigate';
+        state.editBuffer = '';
+        resetScreen();
+        renderToConsole(tree, selectedIndex);
+        return;
+      }
+      if (key.name === 'backspace') {
+        state.editBuffer = state.editBuffer.slice(0, -1);
+        process.stdout.write(`\x1b[${row};1H\x1b[2K\x1b[34mEdit Title:\x1b[0m ${state.editBuffer}`);
+        return;
+      }
+      if (key.name === 'return') {
+        // Update the title
+        if (data[selectedIndex + 1]) {
+          data[selectedIndex + 1].title = state.editBuffer.trim() || data[selectedIndex + 1].title;
+          fhr.saveData(data);
+          fhr.createAsciiTree(data, ['title', 'unique_id']).then(newTree => {
+            tree = newTree;
+            process.stdout.write('\x1B[?25l'); // hide cursor
+            process.stdin.off('keypress', editTitleKeypressHandler);
+            attachKeypressListener();
+            state.mode = 'navigate';
+            state.editBuffer = '';
+            resetScreen();
+            renderToConsole(tree, selectedIndex);
+          });
+        } else {
+          process.stdout.write('\nNo item selected.\n');
+          process.stdout.write('\x1B[?25l'); // hide cursor
+          process.stdin.off('keypress', editTitleKeypressHandler);
+          attachKeypressListener();
+          state.mode = 'navigate';
+          state.editBuffer = '';
+          resetScreen();
+          renderToConsole(tree, selectedIndex);
+        }
+        return;
+      }
+      if (str) {
+        state.editBuffer += str;
+        process.stdout.write(str);
+      }
+    }
+    process.stdin.on('keypress', editTitleKeypressHandler);
+  },
   // (Extend with more handlers as needed)
 };
 
