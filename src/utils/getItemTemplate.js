@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import getCustomExt from './getCustomExt.js'; // Helper to get customExt from customExtStore.json
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -11,14 +12,16 @@ const __dirname = path.dirname(__filename);
  */
 export default async function getLastTemplateObject() {
     try {
+        // get the custom extension
+        const customExt = await getCustomExt();
         // Resolve the path to the template file
-        const templatePath = path.resolve(process.cwd(), '.fhr/template.fhr.json');
+        const templatePath = path.resolve(process.cwd(), `.${customExt}/template.${customExt}.json`);
 
         // Check if the template file exists
         try {
             await fs.access(templatePath);
-        } catch {
-            return null;
+        } catch (err) {
+            throw new Error(`Template file not found: ${templatePath}`);
         }
 
         // Read and parse the template file
@@ -28,6 +31,6 @@ export default async function getLastTemplateObject() {
         // Return the last object if it exists
         return templateData[templateData.length - 1] || null;
     } catch (error) {
-        return null;
+        throw error;
     }
 }

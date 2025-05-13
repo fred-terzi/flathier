@@ -38,10 +38,11 @@ async function findProjectRoot(start = process.cwd()) {
 
 /**
  * Initializes the project by creating necessary directories and files.
- * @param {string} [fileName='FlatHier'] - The base name for the main FHR file.
+ * @param {string} fileName - The base name for the main FHR file.
+ * @param {string} customExt - The custom extension for the template files.
  * @returns {Promise<void>}
  */
-export default async function init(fileName = 'FlatHier') {
+export default async function init(fileName = 'FlatHierFormat', customExt = '.fhr', customID = 'id') {
   // Root will now be the cwd where the user ran `npx fhr init`
   const root = await findProjectRoot();
 
@@ -49,18 +50,56 @@ export default async function init(fileName = 'FlatHier') {
   fileName = sanitizeSpaces(fileName);
 
   // Paths relative to project root
-  const folderPath      = path.join(root, '.fhr');
-  const destinationPath = path.join(folderPath, 'template.fhr.json');
-  const mainFileName    = fileName.endsWith('.fhr.json')
+  const extNoDot = customExt.startsWith('.') ? customExt.slice(1) : customExt;
+  const extWithJson = `${extNoDot}.json`;
+  const folderPath      = path.join(root, `.${extNoDot}`);
+  const destinationPath = path.join(folderPath, `template.${extWithJson}`);
+  const mainFileName    = fileName.endsWith(`.${extWithJson}`)
     ? fileName
-    : `${fileName}.fhr.json`;
+    : `${fileName}.${extWithJson}`;
   const mainFilePath    = path.join(root, mainFileName);
+
+  // Check if the main project file already exists
+  try {
+    await fs.access(mainFilePath);
+    console.error(`❌ Project file already exists at: ${mainFilePath}`);
+    return; // Abort initialization
+  } catch {
+    // File does not exist, continue with initialization
+  }
 
   // Path to the built-in template inside this package
   const templatePath = path.join(__dirname, '../fhrTemplates/fhrTemplate.json');
 
+  // Path to the built-in config template inside this package
+  const configTemplatePath = path.join(__dirname, '../fhrTemplates/fhrConfigTemplate.json');
+  const configDestinationPath = path.join(folderPath, `config.${extWithJson}`);
+
+  // Path to the custom extension store
+  const customExtStorePath = path.join(__dirname, '../fhrTemplates/customExtStore.json');
+  let customExtStore = {};
+  try {
+    const storeData = await fs.readFile(customExtStorePath, 'utf-8');
+    customExtStore = JSON.parse(storeData);
+  } catch {
+    // File might not exist or be empty; start with empty object
+  }
+  customExtStore.customExt = customExt;
+  customExtStore.customID = customID;
+  try {
+    await fs.writeFile(customExtStorePath, JSON.stringify(customExtStore, null, 2));
+    console.log(`✅ Stored customExt (${customExt}) and customID (${customID}) in customExtStore.json`);
+  } catch (err) {
+    console.error('❌ Could not update customExtStore.json:', err);
+  }
+
+  // Save the filepath into the filepath variable in config
+  
+
   console.log(`✅ Creating folder at: ${path.relative(process.cwd(), folderPath)}`);
   await fs.mkdir(folderPath, { recursive: true });
+
+
 
   try {
     // Read and parse the base template from flathier's own templates directory
@@ -72,18 +111,48 @@ export default async function init(fileName = 'FlatHier') {
     }
 
     // Save clean template with updated title only
-    const cleanedTemplate = templateArray.map((item, index) => ({
-      ...item,
-      title: index === 0 ? fileName : item.title,
-    }));
+    const cleanedTemplate = templateArray.map((item, index) => {
+      const newItem = { ...item };
+      newItem.title = index === 0 ? fileName : item.title;
+      // Replace unique_id with customID_ID and set to PLACEHOLDER if needed
+      if (customID !== 'unique_id') {
+        delete newItem.unique_id;
+        const customIDText = `${customID}_ID`;
+        newItem[customIDText] = 'PLACEHOLDER';
+      } else {
+        newItem.unique_id = 'PLACEHOLDER';
+      }
+      return newItem;
+    });
     await fs.writeFile(destinationPath, JSON.stringify(cleanedTemplate, null, 2));
     console.log(`✅ Wrote clean template to: ${path.relative(process.cwd(), destinationPath)}`);
 
-    // Create working copy with unique IDs
-    const workingCopy = cleanedTemplate.map(item => ({
-      ...item,
-      unique_id: generateUniqueId(),
-    }));
+    // Copy the config template into the new folder
+    await fs.copyFile(configTemplatePath, configDestinationPath);
+    console.log(`✅ Copied config template to: ${path.relative(process.cwd(), configDestinationPath)}`);
+
+    // Read, update, and write the config file
+    const configData = await fs.readFile(configDestinationPath, 'utf-8');
+    const configJson = JSON.parse(configData);
+    configJson.filepath = `./${mainFileName}`; // or adjust path as needed
+    await fs.writeFile(configDestinationPath, JSON.stringify(configJson, null, 2));
+    console.log(`✅ Updated config file with new filepath: ${configJson.filepath}`);
+
+    // Create working copy with custom IDs
+    const workingCopy = cleanedTemplate.map((item, index) => {
+      const newItem = { ...item };
+      // Set proj_id to index (0 for first, 1 for second, etc.)
+      newItem.proj_id = index;
+      // If customID is not 'unqiue_id', replace unique_id with customID
+      if (customID !== 'unqiue_id') {
+        delete newItem.unique_id;
+        const customIDText = `${customID}_ID`;
+        newItem[customIDText] = generateUniqueId();
+      } else {
+        newItem.unique_id = generateUniqueId();
+      }
+      return newItem;
+    });
     await fs.writeFile(mainFilePath, JSON.stringify(workingCopy, null, 2));
     console.log(`✅ Created working file at: ${path.relative(process.cwd(), mainFilePath)}`);
 

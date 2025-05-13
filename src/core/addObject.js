@@ -7,11 +7,12 @@ import getLastTemplateObject from '../utils/getItemTemplate.js';
  * Inserts a new object immediately after the item with the specified outline number,
  * assigns it a UUID, and recomputes outlines for the entire list.
  *
- * @param {Array<Object>} data - The flat-array representation of your tree.
- * @param {string} outlineNumber - The outline number of the item after which to insert.
- * @returns {{ data: Array<Object>, selectedIndex: number } | void}
+  * @param {Array} data - The array of objects to modify.
+  * @param {string} outlineNumber - The outline number of the item after which to insert the new object.
+  * @returns {Array} - The modified array with the new object inserted.
+  * @throws {Error} - Throws an error if the template is empty or if the outline number is invalid.
  */
-export default async function addObject(data, outlineNumber) {
+export default async function addObject(data, outlineNumber, newTitle) {
   let template;
   try {
     template = await getLastTemplateObject();
@@ -34,14 +35,22 @@ export default async function addObject(data, outlineNumber) {
 
   // 2. Prepare new object based on external template
   const parentHier = data[selectedIndex].hier;
+  // Assign all _ID fields
   const newObject = {
     ...template,                      // load defaults from JSON
-    unique_id: '',                    // placeholder for unique ID
     hier: parentHier,                 // inherit parent's hierarchy
     outline: 'pending'                // placeholder until computeOutlines runs
   };
-  const uniqueId = generateUniqueId();
-  newObject.unique_id = uniqueId;
+  Object.keys(template).forEach(key => {
+    if (key === 'reqt_ID') {
+      newObject.reqt_ID = generateUniqueId();
+    } else if (key === 'itemKey') {
+      // Use incrementing logic for itemKey
+      const maxItemKey = Math.max(...data.map(item => item.itemKey ?? 0), 0);
+      newObject.itemKey = maxItemKey + 1;
+    }
+  });
+  newObject.title = newTitle;
 
   // 3. Insert and update selection
   const insertPos = selectedIndex + 1;

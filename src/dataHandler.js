@@ -1,12 +1,15 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import getCustomExt from './utils/getCustomExt.js'; // Helper to get customExt from customExtStore.json
+import { get } from 'http';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname  = path.dirname(__filename);
 
 let cachedData     = null;
 let cachedFilePath = null;
+let hasWarned      = false;
 
 /**
  * Finds the root directory of the project by locating the nearest package.json file.
@@ -29,35 +32,30 @@ async function findProjectRoot(start = process.cwd()) {
   }
 }
 
+
+
 /**
- * Finds the .fhr.json file by looking only in the project root.
+ * Finds the main project file by using the custom extension from customExtStore.json.
  */
 async function findFhrFile() {
   if (cachedFilePath) return cachedFilePath;
 
   const root = await findProjectRoot();    // starts at process.cwd()
+  const customExt = await getCustomExt();
+  const extWithJson = customExt.endsWith('.json') ? customExt : `${customExt}.json`;
 
-  // Look for any *.fhr.json file in the root folder
+  // Look for any *.<customExt>.json file in the root folder
   const files = await fs.readdir(root);
-  const fhrFile = files.find(f => f.endsWith('.fhr.json'));
-  if (!fhrFile) {
-    console.warn(
-      '❌ No .fhr.json file found in project root.\n' +
-      '    Run `npx fhr init "<Name>"` to create one.'
-    );
-    return null;
-  }
+  const fhrFile = files.find(f => f.endsWith(`.${extWithJson}`));
+
 
   cachedFilePath = path.join(root, fhrFile);
   return cachedFilePath;
 }
 
-
 export async function loadData() {
   const filePath = await findFhrFile();
-  if (!filePath) {
-    throw new Error('No .fhr.json file found in your project.');
-  }
+
   const raw = await fs.readFile(filePath, 'utf-8');
   cachedData     = JSON.parse(raw);
   cachedFilePath = filePath;
