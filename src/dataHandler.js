@@ -35,12 +35,26 @@ async function findProjectRoot(start = process.cwd()) {
 
 
 /**
- * Finds the main project file by using the custom extension from customExtStore.json.
+ * Finds the main project file by using the config file if available, otherwise falls back to custom extension logic.
  */
 async function findFhrFile() {
   if (cachedFilePath) return cachedFilePath;
 
   const root = await findProjectRoot();    // starts at process.cwd()
+  // Try to use config file if it exists
+  const configPath = path.join(root, '.reqt', 'config.reqt.json');
+  try {
+    const config = JSON.parse(await fs.readFile(configPath, 'utf-8'));
+    if (config.filepath) {
+      const absPath = path.resolve(root, config.filepath);
+      await fs.access(absPath); // throws if not found
+      cachedFilePath = absPath;
+      return cachedFilePath;
+    }
+  } catch {
+    // ignore, fallback to old logic
+  }
+  // Fallback: use custom extension logic
   const customExt = await getCustomExt();
   const extNoDot = customExt.startsWith('.') ? customExt.slice(1) : customExt;
   const extWithJson = extNoDot.endsWith('.json') ? extNoDot : `${extNoDot}.json`;
