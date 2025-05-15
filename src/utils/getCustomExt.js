@@ -21,9 +21,9 @@ export default async function getCustomExt() {
 
   try {
     const storeData = await fs.readFile(customExtStorePath, 'utf-8');
-    const storeArray = JSON.parse(storeData);
-    if (Array.isArray(storeArray) && storeArray.length > 0 && storeArray[0].customExt) {
-      return storeArray[0].customExt;
+    const storeObj = JSON.parse(storeData);
+    if (storeObj && typeof storeObj === 'object' && storeObj.customExt) {
+      return storeObj.customExt;
     }
   } catch (err) {
     console.error('[getCustomExt] Failed to read customExtStore.json. Tried paths:', triedPaths, '\nError:', err.message);
