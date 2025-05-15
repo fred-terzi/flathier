@@ -42,14 +42,22 @@ async function findFhrFile() {
 
   const root = await findProjectRoot();    // starts at process.cwd()
   const customExt = await getCustomExt();
-  const extWithJson = customExt.endsWith('.json') ? customExt : `${customExt}.json`;
+  const extNoDot = customExt.startsWith('.') ? customExt.slice(1) : customExt;
+  const extWithJson = extNoDot.endsWith('.json') ? extNoDot : `${extNoDot}.json`;
+  const folderPath = path.join(root, `.${extNoDot}`);
 
-  // Look for any *.<customExt>.json file in the root folder
-  const files = await fs.readdir(root);
+  // Look for any *.<customExt>.json file in the correct subfolder
+  let files = [];
+  try {
+    files = await fs.readdir(folderPath);
+  } catch {
+    throw new Error(`Data folder not found: ${folderPath}`);
+  }
   const fhrFile = files.find(f => f.endsWith(`.${extWithJson}`));
-
-
-  cachedFilePath = path.join(root, fhrFile);
+  if (!fhrFile) {
+    throw new Error(`No main project file found in ${folderPath} with extension .${extWithJson}`);
+  }
+  cachedFilePath = path.join(folderPath, fhrFile);
   return cachedFilePath;
 }
 

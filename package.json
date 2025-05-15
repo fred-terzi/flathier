@@ -5,10 +5,10 @@
   "main": "./lib/api.js",
   "scripts": {
     "start": "./lib/api.js",
-    "testClean": "node tests/cleanup.js"
+    "testClean": "node tests/cleanup.js",
+    "test": "for f in tests/*.js; do node \"$f\"; done"
   },
   "author": "Joseph Terzi",
-
   "license": "AGPL-3.0",
   "exports": {
     ".": "./lib/api.js"

@@ -2,6 +2,15 @@ import fs from 'fs/promises';
 import path from 'path';
 import init from '../src/commands/init.js';
 
+// Run testClean at the start
+async function runTestClean() {
+  try {
+    await import('./cleanup.js');
+  } catch (e) {
+    // ignore if cleanup.js does not exist or fails
+  }
+}
+
 async function fileExists(filePath) {
   try {
     await fs.access(filePath);
@@ -12,6 +21,8 @@ async function fileExists(filePath) {
 }
 
 async function runInitTest() {
+  await runTestClean(); // Clean up before test
+
   const testRoot = process.cwd();
   const testExt = '.testfhr';
   const testFileName = 'TestProject';

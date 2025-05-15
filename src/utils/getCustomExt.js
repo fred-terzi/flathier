@@ -29,5 +29,5 @@ export default async function getCustomExt() {
     console.error('[getCustomExt] Failed to read customExtStore.json. Tried paths:', triedPaths, '\nError:', err.message);
     // fallback to default
   }
-  return 'fhr'; // fallback default
+  return '.fhr'; // fallback default, now always returns with leading dot
 }
