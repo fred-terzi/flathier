@@ -71,22 +71,19 @@ async function runFullUserCaseRoundTripTest() {
   treeAfterMoves.forEach(row => console.log(row));
 
   // 7. Delete grandchild
-  const idField = `${extNoDot}_ID`;
-  // Patch getCustomExt.sync so deleteObject uses the correct ID field
-  getCustomExt.sync = () => testExt;
-  // Find the grandchild by outline '1.1' after moveUp/moveDown
   const grandchildAfterMoves = data.find(item => item.outline === '1.1' && item.title === 'Grandchild of First');
   if (!grandchildAfterMoves) {
     console.error('Could not find Grandchild of First with outline 1.1 after moveUp/moveDown.');
     return;
   }
-  const grandchildId = grandchildAfterMoves[idField];
-  const afterDelete = deleteObject(data, grandchildId);
+  // Use outline number instead of custom ID for deleteObject
+  const grandchildOutline = grandchildAfterMoves.outline;
+  const afterDelete = deleteObject(data, grandchildOutline);
   if (!Array.isArray(afterDelete)) {
     console.error('deleteObject failed: Returned undefined or not an array.');
     return;
   }
-  if (afterDelete.find(item => item[idField] === grandchildId)) {
+  if (afterDelete.find(item => item.outline === grandchildOutline)) {
     console.error('deleteObject failed: Grandchild still present.');
     return;
   }
