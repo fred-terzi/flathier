@@ -3,14 +3,16 @@ import fs from 'fs/promises';
 import path from 'path';
 
 async function cleanTestArtifacts() {
-  const testExt = '.testfhr';
-  const extNoDot = testExt.slice(1);
-  const folderPath = path.join(process.cwd(), `.${extNoDot}`);
-  try {
-    await fs.rm(folderPath, { recursive: true, force: true });
-    console.log(`Removed test folder: ${folderPath}`);
-  } catch (err) {
-    console.log(`No test folder to remove: ${folderPath}`);
+  const testExts = ['.testfhr', '.fhr'];
+  for (const testExt of testExts) {
+    const extNoDot = testExt.slice(1);
+    const folderPath = path.join(process.cwd(), `.${extNoDot}`);
+    try {
+      await fs.rm(folderPath, { recursive: true, force: true });
+      console.log(`Removed test folder: ${folderPath}`);
+    } catch (err) {
+      console.log(`No test folder to remove: ${folderPath}`);
+    }
   }
 }
 
