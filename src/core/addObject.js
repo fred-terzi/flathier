@@ -17,8 +17,16 @@ import getCustomExt from '../utils/getCustomExt.js';
  */
 export default async function addObject(data, outlineNumber, newTitle) {
   let template;
+  let customExt;
   try {
-    template = await getLastTemplateObject();
+    customExt = await getCustomExt();
+    customExt = (typeof customExt === 'string') ? customExt.trim() : String(customExt || '').trim();
+    if (!customExt) {
+      throw new Error('Custom extension is not defined or invalid.');
+    }
+
+    // Use customExt to get the correct template from the right folder
+    template = await getLastTemplateObject(customExt); // pass customExt to template loader
     if (!template) {
       throw new Error('Template is empty or could not be loaded.');
     }
@@ -45,8 +53,6 @@ export default async function addObject(data, outlineNumber, newTitle) {
     outline: 'pending'                // placeholder until computeOutlines runs
   };
   // Generalize _ID assignment using custom extension
-  let customExt = await getCustomExt();
-  customExt = (typeof customExt === 'string') ? customExt.trim() : String(customExt || '').trim();
   if (!customExt) {
     throw new Error('Custom extension is not defined or invalid.');
   }
