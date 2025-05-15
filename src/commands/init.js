@@ -85,21 +85,17 @@ export default async function init(fileName = 'FlatHierFormat', customExt = '.fh
     // File might not exist or be empty; start with empty object
   }
   customExtStore.customExt = customExt;
-  customExtStore.customID = customID;
   try {
     await fs.writeFile(customExtStorePath, JSON.stringify(customExtStore, null, 2));
-    console.log(`✅ Stored customExt (${customExt}) and customID (${customID}) in customExtStore.json`);
+    console.log(`✅ Stored customExt (${customExt}) in customExtStore.json`);
   } catch (err) {
     console.error('❌ Could not update customExtStore.json:', err);
   }
 
   // Save the filepath into the filepath variable in config
-  
 
   console.log(`✅ Creating folder at: ${path.relative(process.cwd(), folderPath)}`);
   await fs.mkdir(folderPath, { recursive: true });
-
-
 
   try {
     // Read and parse the base template from flathier's own templates directory
@@ -114,14 +110,8 @@ export default async function init(fileName = 'FlatHierFormat', customExt = '.fh
     const cleanedTemplate = templateArray.map((item, index) => {
       const newItem = { ...item };
       newItem.title = index === 0 ? fileName : item.title;
-      // Replace unique_id with customID_ID and set to PLACEHOLDER if needed
-      if (customID !== 'unique_id') {
-        delete newItem.unique_id;
-        const customIDText = `${customID}_ID`;
-        newItem[customIDText] = 'PLACEHOLDER';
-      } else {
-        newItem.unique_id = 'PLACEHOLDER';
-      }
+      // Remove unique_id logic for customID
+      newItem.unique_id = 'PLACEHOLDER';
       return newItem;
     });
     await fs.writeFile(destinationPath, JSON.stringify(cleanedTemplate, null, 2));
@@ -138,18 +128,10 @@ export default async function init(fileName = 'FlatHierFormat', customExt = '.fh
     await fs.writeFile(configDestinationPath, JSON.stringify(configJson, null, 2));
     console.log(`✅ Updated config file with new filepath: ${configJson.filepath}`);
 
-    // Create working copy with custom IDs
+    // Create working copy with unique IDs only
     const workingCopy = await Promise.all(cleanedTemplate.map(async (item, index) => {
       const newItem = { ...item };
-
-      // If customID is not 'unique_id', replace unique_id with customID
-      if (customID !== 'unique_id') {
-        delete newItem.unique_id;
-        const customIDText = `${customID}_ID`;
-        newItem[customIDText] = await generateUniqueId();
-      } else {
-        newItem.unique_id = await generateUniqueId();
-      }
+      newItem.unique_id = await generateUniqueId();
       return newItem;
     }));
     await fs.writeFile(mainFilePath, JSON.stringify(workingCopy, null, 2));
