@@ -3,10 +3,13 @@ import computeOutlines from "../utils/computeOutlines.js";
 /**
  * Moves a node (and its entire subtree) up one position among its siblings
  * and reassigns new outline numbers for all nodes.
- * @param {Array<{ unique_id: string, title: string, hier: number, outline: string }>} items
+ * @param {Array<Object>} items - The flat array of items (must include the custom ID field, e.g., fhr_ID)
  * @param {string} outlineToMove - The outline number of the node to move (e.g. "2.1").
  * @returns {Array} A new array with updated hier and outline fields.
  */
+// The function is compatible with the new custom ID field logic, as it does not reference unique_id directly.
+// It operates on outline and preserves all fields, so custom ID fields are retained.
+// No changes needed for compatibility.
 export default function moveUp(items, outlineToMove) {
     // Get the unique_id of the item to move
     const itemToMove = items.find(i => i.outline === outlineToMove);
