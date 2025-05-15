@@ -24,14 +24,15 @@ async function runAddObjectTest() {
   // Add a new object after the first item (outline '0')
   const newTitle = 'Added by addObject test';
   const outlineNumber = '0';
+  const idField = `${extNoDot}_ID`;
   try {
     const updatedData = await addObject(data, outlineNumber, newTitle);
     if (!Array.isArray(updatedData)) throw new Error('addObject did not return an array');
     const found = updatedData.find(item => item.title === newTitle);
     if (!found) throw new Error('New object not found in data after addObject');
-    if (!found.unique_id) throw new Error('New object missing unique_id');
+    if (!found[idField]) throw new Error('New object missing custom ID field');
     if (found.outline === 'pending') throw new Error('New object outline not computed');
-    console.log('addObject() test passed: New object added with unique_id and outline computed.');
+    console.log('addObject() test passed: New object added with custom ID field and outline computed.');
   } catch (err) {
     console.error('addObject() test failed:', err.message);
     return;
