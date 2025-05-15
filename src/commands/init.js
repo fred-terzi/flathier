@@ -139,19 +139,19 @@ export default async function init(fileName = 'FlatHierFormat', customExt = '.fh
     console.log(`✅ Updated config file with new filepath: ${configJson.filepath}`);
 
     // Create working copy with custom IDs
-    const workingCopy = cleanedTemplate.map((item, index) => {
+    const workingCopy = await Promise.all(cleanedTemplate.map(async (item, index) => {
       const newItem = { ...item };
 
       // If customID is not 'unique_id', replace unique_id with customID
       if (customID !== 'unique_id') {
         delete newItem.unique_id;
         const customIDText = `${customID}_ID`;
-        newItem[customIDText] = generateUniqueId();
+        newItem[customIDText] = await generateUniqueId();
       } else {
-        newItem.unique_id = generateUniqueId();
+        newItem.unique_id = await generateUniqueId();
       }
       return newItem;
-    });
+    }));
     await fs.writeFile(mainFilePath, JSON.stringify(workingCopy, null, 2));
     console.log(`✅ Created working file at: ${path.relative(process.cwd(), mainFilePath)}`);
 
