@@ -60,6 +60,9 @@ export default async function init(fileName = 'FlatHierFormat', customExt = '.fh
   // Change: Save main file in the new folder, not root
   const mainFilePath    = path.join(folderPath, mainFileName);
 
+  // The custom ID field name (e.g., fhr_ID, not .fhr_ID)
+  const customIdField = `${extNoDot}_ID`;
+
   // Check if the main project file already exists in the new folder
   try {
     await fs.access(mainFilePath);
@@ -111,8 +114,9 @@ export default async function init(fileName = 'FlatHierFormat', customExt = '.fh
     const cleanedTemplate = templateArray.map((item, index) => {
       const newItem = { ...item };
       newItem.title = index === 0 ? fileName : item.title;
-      // Remove unique_id logic for customID
-      newItem.unique_id = 'PLACEHOLDER';
+      // Remove unique_id and set customIdField to PLACEHOLDER
+      delete newItem.unique_id;
+      newItem[customIdField] = 'PLACEHOLDER';
       return newItem;
     });
     await fs.writeFile(destinationPath, JSON.stringify(cleanedTemplate, null, 2));
@@ -130,10 +134,10 @@ export default async function init(fileName = 'FlatHierFormat', customExt = '.fh
     await fs.writeFile(configDestinationPath, JSON.stringify(configJson, null, 2));
     console.log(`✅ Updated config file with new filepath: ${configJson.filepath}`);
 
-    // Create working copy with unique IDs only
+    // Create working copy with unique IDs only (using customIdField)
     const workingCopy = await Promise.all(cleanedTemplate.map(async (item, index) => {
       const newItem = { ...item };
-      newItem.unique_id = await generateUniqueId();
+      newItem[customIdField] = await generateUniqueId();
       return newItem;
     }));
     await fs.writeFile(mainFilePath, JSON.stringify(workingCopy, null, 2));

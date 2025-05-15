@@ -53,7 +53,7 @@ async function runInitTest() {
     configFileCorrect = configJson.filepath === `./.${extNoDot}/${mainFileName}`;
   }
 
-  // Output results
+  // Output results with details
   if (mainExists && configExists && templateExists && configFileCorrect) {
     console.log('init() test passed: All files created in the new folder and config filepath is correct.');
   } else {
@@ -62,6 +62,20 @@ async function runInitTest() {
     if (!configExists) console.error('  Config file missing:', configPath);
     if (!templateExists) console.error('  Template file missing:', templatePath);
     if (!configFileCorrect) console.error('  Config filepath incorrect.');
+  }
+
+  // Print file contents for verification
+  if (mainExists) {
+    const mainData = await fs.readFile(mainFilePath, 'utf-8');
+    console.log(`\nMain file (${mainFileName}):\n`, mainData);
+  }
+  if (templateExists) {
+    const templateData = await fs.readFile(templatePath, 'utf-8');
+    console.log(`\nTemplate file (template.${extWithJson}):\n`, templateData);
+  }
+  if (configExists) {
+    const configData = await fs.readFile(configPath, 'utf-8');
+    console.log(`\nConfig file (config.${extWithJson}):\n`, configData);
   }
 }
 
