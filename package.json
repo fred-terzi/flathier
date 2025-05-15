@@ -1,6 +1,6 @@
 {
   "name": "@terzitech/flathier",
-  "version": "0.1.0-demo.7",
+  "version": "0.1.0-demo.8",
   "description": "Create and manipulate hierarchical data stored in a flat json. ",
   "main": "./lib/api.js",
   "scripts": {
