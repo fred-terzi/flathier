@@ -1,12 +1,14 @@
 {
   "name": "@terzitech/flathier",
   "version": "0.1.0-demo.8",
-  "description": "Create and manipulate hierarchical data stored in a flat json. ",
+  "description": "Create and manipulate hierarchical data stored in a flat JSON structure, with utilities for editing, organizing, and visualizing the hierarchy.",
   "main": "./lib/api.js",
   "scripts": {
-    "start": "./lib/api.js"
+    "start": "./lib/api.js",
+    "testClean": "node tests/cleanup.js"
   },
   "author": "Joseph Terzi",
+
   "license": "AGPL-3.0",
   "exports": {
     ".": "./lib/api.js"

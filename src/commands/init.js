@@ -57,9 +57,10 @@ export default async function init(fileName = 'FlatHierFormat', customExt = '.fh
   const mainFileName    = fileName.endsWith(`.${extWithJson}`)
     ? fileName
     : `${fileName}.${extWithJson}`;
-  const mainFilePath    = path.join(root, mainFileName);
+  // Change: Save main file in the new folder, not root
+  const mainFilePath    = path.join(folderPath, mainFileName);
 
-  // Check if the main project file already exists
+  // Check if the main project file already exists in the new folder
   try {
     await fs.access(mainFilePath);
     console.error(`❌ Project file already exists at: ${mainFilePath}`);
@@ -124,7 +125,8 @@ export default async function init(fileName = 'FlatHierFormat', customExt = '.fh
     // Read, update, and write the config file
     const configData = await fs.readFile(configDestinationPath, 'utf-8');
     const configJson = JSON.parse(configData);
-    configJson.filepath = `./${mainFileName}`; // or adjust path as needed
+    // Update config to point to the file in the new folder
+    configJson.filepath = `./${path.join(`.${extNoDot}`, mainFileName)}`;
     await fs.writeFile(configDestinationPath, JSON.stringify(configJson, null, 2));
     console.log(`✅ Updated config file with new filepath: ${configJson.filepath}`);
 
