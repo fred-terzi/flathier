@@ -33,10 +33,11 @@ flowchart TD
     D -- No --> F["Create config & template folder structure"]
     F --> G["Store customExt in customExtStore.json"]
     G --> H["Write clean template (title, PLACEHOLDER unique_id)"]
-    H --> I["Copy and update config template (filepath)"]
-    I --> J["Create working copy with generated unique_id"]
-    J --> K["Write main project file"]
-    K --> L["Initialization complete"]
+    H --> I["Rename unique_id to customExt_ID in template"]
+    I --> J["Copy and update config template (filepath)"]
+    J --> K["Create working copy with generated unique_id"]
+    K --> L["Write main project file"]
+    L --> M["Initialization complete"]
 ```
 
 version: 0.1.0-demo.9 proposed changes
