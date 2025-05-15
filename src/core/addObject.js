@@ -74,19 +74,17 @@ export default async function addObject(data, outlineNumber, newTitle) {
 }
 
 /**
- * Assigns a generated unique ID to all fields in the object that match the custom extension _ID pattern.
+ * Assigns a generated unique ID to the field in the object that matches the custom extension _ID pattern (case-sensitive, exact match).
  *
  * @async
  * @param {Object} obj - The object to update.
- * @param {string} customExt - The custom extension string (e.g., 'reqt').
- * @returns {Promise<void>} - Resolves when all matching fields have been updated.
+ * @param {string} customExt - The custom extension string (e.g., '.fhr').
+ * @returns {Promise<void>} - Resolves when the matching field has been updated.
  */
 async function assignCustomIds(obj, customExt) {
-  const extId = `${customExt.toUpperCase()}_ID`;
-  for (const key of Object.keys(obj)) {
-    const keyUpper = key.toUpperCase();
-    if (keyUpper === extId || keyUpper.endsWith(`_${extId}`)) {
-      obj[key] = await generateUniqueId();
-    }
+  const extNoDot = customExt.startsWith('.') ? customExt.slice(1) : customExt;
+  const idField = `${extNoDot}_ID`;
+  if (Object.prototype.hasOwnProperty.call(obj, idField)) {
+    obj[idField] = await generateUniqueId();
   }
 }

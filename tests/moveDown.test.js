@@ -33,19 +33,20 @@ async function runMoveDownTest() {
   }
 
   // Print data before moveDown
-  console.log('Before moveDown:', data.map(item => ({title: item.title, outline: item.outline, unique_id: item.unique_id})));
+  const idField = `${extNoDot}_ID`;
+  console.log('Before moveDown:', data.map(item => ({title: item.title, outline: item.outline, [idField]: item[idField]})));
 
   // Move the first item down (should swap with the second)
   const movedData = moveDown(data, first.outline);
 
   // Print data after moveDown
-  console.log('After moveDown:', movedData.map(item => ({title: item.title, outline: item.outline, unique_id: item.unique_id})));
+  console.log('After moveDown:', movedData.map(item => ({title: item.title, outline: item.outline, [idField]: item[idField]})));
 
-  // Find the new unique_id positions after moveDown
-  const firstIdx = movedData.findIndex(item => item.unique_id === first.unique_id);
-  const secondIdx = movedData.findIndex(item => item.unique_id === second.unique_id);
+  // Find the new idField positions after moveDown
+  const firstIdx = movedData.findIndex(item => item[idField] === first[idField]);
+  const secondIdx = movedData.findIndex(item => item[idField] === second[idField]);
   if (firstIdx !== secondIdx + 1) {
-    console.error('moveDown() test failed: First item did not move down (by unique_id).');
+    console.error('moveDown() test failed: First item did not move down (by custom id field).');
     return;
   }
   // Check that outlines are recomputed and unique
@@ -55,8 +56,8 @@ async function runMoveDownTest() {
     console.error('moveDown() test failed: Outlines are not unique after move.');
     return;
   }
-  // Check that both unique_ids are still present
-  if (!movedData.find(item => item.unique_id === first.unique_id) || !movedData.find(item => item.unique_id === second.unique_id)) {
+  // Check that both ids are still present
+  if (!movedData.find(item => item[idField] === first[idField]) || !movedData.find(item => item[idField] === second[idField])) {
     console.error('moveDown() test failed: One of the items is missing after move.');
     return;
   }
@@ -65,7 +66,7 @@ async function runMoveDownTest() {
     console.error('moveDown() test failed: Titles do not match expected order after move.');
     return;
   }
-  console.log('moveDown() test passed: Item was moved down and outlines recomputed, verified by unique_id and title order.');
+  console.log('moveDown() test passed: Item was moved down and outlines recomputed, verified by custom id field and title order.');
 }
 
 if (process.argv[1] === new URL(import.meta.url).pathname) {
