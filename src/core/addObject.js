@@ -2,15 +2,18 @@
 import generateUniqueId from '../utils/generateUniqueId.js';
 import computeOutlines from '../utils/computeOutlines.js';
 import getLastTemplateObject from '../utils/getItemTemplate.js';
+import getCustomExt from '../utils/getCustomExt.js';
 
 /**
  * Inserts a new object immediately after the item with the specified outline number,
- * assigns it a UUID, and recomputes outlines for the entire list.
+ * assigns unique IDs to all custom extension _ID fields, and recomputes outlines for the entire list.
  *
-  * @param {Array} data - The array of objects to modify.
-  * @param {string} outlineNumber - The outline number of the item after which to insert the new object.
-  * @returns {Array} - The modified array with the new object inserted.
-  * @throws {Error} - Throws an error if the template is empty or if the outline number is invalid.
+ * @async
+ * @param {Array<Object>} data - The array of objects to modify.
+ * @param {string} outlineNumber - The outline number of the item after which to insert the new object.
+ * @param {string} newTitle - The title for the new object.
+ * @returns {Promise<Array<Object>>} - The modified array with the new object inserted.
+ * @throws {Error} - Throws an error if the template is empty or if the outline number is invalid.
  */
 export default async function addObject(data, outlineNumber, newTitle) {
   let template;
@@ -41,15 +44,15 @@ export default async function addObject(data, outlineNumber, newTitle) {
     hier: parentHier,                 // inherit parent's hierarchy
     outline: 'pending'                // placeholder until computeOutlines runs
   };
-  Object.keys(template).forEach(key => {
-    if (key === 'reqt_ID') {
-      newObject.reqt_ID = generateUniqueId();
-    } else if (key === 'itemKey') {
-      // Use incrementing logic for itemKey
-      const maxItemKey = Math.max(...data.map(item => item.itemKey ?? 0), 0);
-      newObject.itemKey = maxItemKey + 1;
-    }
-  });
+  // Generalize _ID assignment using custom extension
+  let customExt = await getCustomExt();
+  customExt = (typeof customExt === 'string') ? customExt.trim() : String(customExt || '').trim();
+  if (!customExt) {
+    throw new Error('Custom extension is not defined or invalid.');
+  }
+
+  // Assign unique IDs to all matching _ID fields
+  await assignCustomIds(newObject, customExt);
 
   newObject.title = newTitle;
 
@@ -62,4 +65,22 @@ export default async function addObject(data, outlineNumber, newTitle) {
   computeOutlines(data);
 
   return data;
+}
+
+/**
+ * Assigns a generated unique ID to all fields in the object that match the custom extension _ID pattern.
+ *
+ * @async
+ * @param {Object} obj - The object to update.
+ * @param {string} customExt - The custom extension string (e.g., 'reqt').
+ * @returns {Promise<void>} - Resolves when all matching fields have been updated.
+ */
+async function assignCustomIds(obj, customExt) {
+  const extId = `${customExt.toUpperCase()}_ID`;
+  for (const key of Object.keys(obj)) {
+    const keyUpper = key.toUpperCase();
+    if (keyUpper === extId || keyUpper.endsWith(`_${extId}`)) {
+      obj[key] = await generateUniqueId();
+    }
+  }
 }
