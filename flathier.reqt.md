@@ -71,3 +71,7 @@ flowchart TD
     D --> E["Recompute outlines for the entire data array"]
     E --> F["Return updated data array"]
 ```
+
+
+# BUG: Custom Extensions are not being saved in the src/fhrTemplates/customExtStore.json
+
