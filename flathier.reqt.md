@@ -57,3 +57,16 @@ flowchart TD
 ```
 
 This diagram shows the step-by-step logic of the `init` function, including handling of custom extensions, template/config creation, and unique ID generation.
+
+## deleteObject function
+
+### Flow Diagram
+
+```mermaid
+flowchart TD
+    A["deleteObject(data, outlineNumber)"] --> B["Find index of item with outlineNumber"]
+    B -- Not found --> C["Log error and return"]
+    B -- Found --> D["Remove item at found index from data array"]
+    D --> E["Recompute outlines for the entire data array"]
+    E --> F["Return updated data array"]
+```
