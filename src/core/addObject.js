@@ -1,7 +1,6 @@
 // src/commands/addObject.js
 import generateUniqueId from '../utils/generateUniqueId.js';
 import computeOutlines from '../utils/computeOutlines.js';
-import getLastTemplateObject from '../utils/getItemTemplate.js';
 import getCustomExt from '../utils/getCustomExt.js';
 
 /**
@@ -11,12 +10,11 @@ import getCustomExt from '../utils/getCustomExt.js';
  * @async
  * @param {Array<Object>} data - The array of objects to modify.
  * @param {string} outlineNumber - The outline number of the item after which to insert the new object.
- * @param {string} newTitle - The title for the new object.
+ * @param {Object} newObject - The new object to insert (already constructed from template).
  * @returns {Promise<Array<Object>>} - The modified array with the new object inserted.
- * @throws {Error} - Throws an error if the template is empty or if the outline number is invalid.
+ * @throws {Error} - Throws an error if the outline number is invalid.
  */
-export default async function addObject(data, outlineNumber, newTitle) {
-  let template;
+export default async function addObject(data, outlineNumber, newObject) {
   let customExt;
   try {
     customExt = await getCustomExt();
@@ -24,14 +22,8 @@ export default async function addObject(data, outlineNumber, newTitle) {
     if (!customExt) {
       throw new Error('Custom extension is not defined or invalid.');
     }
-
-    // Use customExt to get the correct template from the right folder
-    template = await getLastTemplateObject(customExt); // pass customExt to template loader
-    if (!template) {
-      throw new Error('Template is empty or could not be loaded.');
-    }
   } catch (err) {
-    throw new Error(`Failed to load template: ${err.message}`);
+    throw new Error(`Failed to load custom extension: ${err.message}`);
   }
 
   // 1. Find the selected index based on the outline number
@@ -44,14 +36,11 @@ export default async function addObject(data, outlineNumber, newTitle) {
     return;
   }
 
-  // 2. Prepare new object based on external template
+  // 2. Prepare new object (already constructed from template)
   const parentHier = data[selectedIndex].hier;
-  // Assign all _ID fields
-  const newObject = {
-    ...template,                      // load defaults from JSON
-    hier: parentHier,                 // inherit parent's hierarchy
-    outline: 'pending'                // placeholder until computeOutlines runs
-  };
+  newObject.hier = parentHier; // inherit parent's hierarchy
+  newObject.outline = 'pending'; // placeholder until computeOutlines runs
+
   // Generalize _ID assignment using custom extension
   if (!customExt) {
     throw new Error('Custom extension is not defined or invalid.');
@@ -60,12 +49,9 @@ export default async function addObject(data, outlineNumber, newTitle) {
   // Assign unique IDs to all matching _ID fields
   await assignCustomIds(newObject, customExt);
 
-  newObject.title = newTitle;
-
   // 3. Insert and update selection
   const insertPos = selectedIndex + 1;
   data.splice(insertPos, 0, newObject);
-  const newSelectedIndex = insertPos;
 
   // 4. Recompute outlines for the entire data array
   computeOutlines(data);
