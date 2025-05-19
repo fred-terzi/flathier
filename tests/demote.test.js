@@ -1,48 +1,26 @@
-import fs from 'fs/promises';
-import path from 'path';
-import init from '../src/commands/init.js';
-import * as dataHandler from '../src/dataHandler.js';
-import addObject from '../src/core/addObject.js';
 import demote from '../src/core/demote.js';
 
 async function runDemoteTest() {
-  // Use the default extension for consistency
-  const testExt = '.fhr';
-  const testFileName = 'TestProject';
-  const extNoDot = testExt.slice(1);
-  const extWithJson = `${extNoDot}.json`;
-  const folderPath = path.join(process.cwd(), `.${extNoDot}`);
-
-  // Clean up before test
-  try { await fs.rm(folderPath, { recursive: true, force: true }); } catch {}
-
-  // Use init to create the test folder and files
-  await init(testFileName, testExt);
-  let data = await dataHandler.loadData();
-
-  // Add two new objects after the first item (outline '0')
-  data = await addObject(data, '0', 'First Child');
-  data = await addObject(data, '1', 'Second Child');
-
-  // Find outlines
-  const first = data.find(item => item.title === 'First Child');
-  const second = data.find(item => item.title === 'Second Child');
-  if (!first || !second) {
-    console.error('demote() test failed: Could not add objects to demote.');
-    return;
-  }
+  // Use mock data: Root -> First Child, Second Child
+  const data = [
+    { outline: '0', hier: 0, title: 'Root' },
+    { outline: '0.1', hier: 1, title: 'First Child' },
+    { outline: '0.2', hier: 1, title: 'Second Child' }
+  ];
 
   // Demote the second child (should become a child of the first)
-  const demotedData = demote(data, second.outline);
-  // Find the demoted node in the new tree
+  const demotedData = demote(data, '0.2');
+
+  // Find the demoted node and its new parent
   const demoted = demotedData.find(item => item.title === 'Second Child');
   const newParent = demotedData.find(item => item.title === 'First Child');
 
-  // Check that the demoted node's hier is one level deeper than its new parent
+  // Check that the demoted node exists and has a parent
   if (!demoted || !newParent) {
     console.error('demote() test failed: Could not find demoted or parent node.');
     return;
   }
+  // Check that the demoted node's hier is one level deeper than its new parent
   const demotedHier = parseInt(demoted.hier, 10);
   const parentHier = parseInt(newParent.hier, 10);
   if (demotedHier !== parentHier + 1) {
