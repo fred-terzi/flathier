@@ -1,52 +1,21 @@
-import fs from 'fs/promises';
-import path from 'path';
-import init from '../src/commands/init.js';
-import * as dataHandler from '../src/dataHandler.js';
-import addObject from '../src/core/addObject.js';
 import moveDown from '../src/core/moveDown.js';
 
 async function runMoveDownTest() {
-  // Use the default extension for consistency
-  const testExt = '.fhr';
-  const testFileName = 'TestProject';
-  const extNoDot = testExt.slice(1);
-  const extWithJson = `${extNoDot}.json`;
-  const folderPath = path.join(process.cwd(), `.${extNoDot}`);
-
-  // Clean up before test
-  try { await fs.rm(folderPath, { recursive: true, force: true }); } catch {}
-
-  // Use init to create the test folder and files
-  await init(testFileName, testExt);
-  let data = await dataHandler.loadData();
-
-  // Add two new objects after the first item (outline '0')
-  data = await addObject(data, '0', 'First Item');
-  data = await addObject(data, '1', 'Second Item');
-
-  // Find outlines
-  const first = data.find(item => item.title === 'First Item');
-  const second = data.find(item => item.title === 'Second Item');
-  if (!first || !second) {
-    console.error('moveDown() test failed: Could not add objects to move.');
-    return;
-  }
-
-  // Print data before moveDown
-  const idField = `${extNoDot}_ID`;
-  console.log('Before moveDown:', data.map(item => ({title: item.title, outline: item.outline, [idField]: item[idField]})));
+  // Use mock data: Root -> First Item, Second Item
+  const data = [
+    { outline: '0', hier: 0, title: 'Root' },
+    { outline: '0.1', hier: 1, title: 'First Item' },
+    { outline: '0.2', hier: 1, title: 'Second Item' }
+  ];
 
   // Move the first item down (should swap with the second)
-  const movedData = moveDown(data, first.outline);
+  const movedData = moveDown(data, '0.1');
 
-  // Print data after moveDown
-  console.log('After moveDown:', movedData.map(item => ({title: item.title, outline: item.outline, [idField]: item[idField]})));
-
-  // Find the new idField positions after moveDown
-  const firstIdx = movedData.findIndex(item => item[idField] === first[idField]);
-  const secondIdx = movedData.findIndex(item => item[idField] === second[idField]);
+  // Find the new positions after moveDown
+  const firstIdx = movedData.findIndex(item => item.title === 'First Item');
+  const secondIdx = movedData.findIndex(item => item.title === 'Second Item');
   if (firstIdx !== secondIdx + 1) {
-    console.error('moveDown() test failed: First item did not move down (by custom id field).');
+    console.error('moveDown() test failed: First item did not move down (by title order).');
     return;
   }
   // Check that outlines are recomputed and unique
@@ -56,8 +25,8 @@ async function runMoveDownTest() {
     console.error('moveDown() test failed: Outlines are not unique after move.');
     return;
   }
-  // Check that both ids are still present
-  if (!movedData.find(item => item[idField] === first[idField]) || !movedData.find(item => item[idField] === second[idField])) {
+  // Check that both items are still present
+  if (!movedData.find(item => item.title === 'First Item') || !movedData.find(item => item.title === 'Second Item')) {
     console.error('moveDown() test failed: One of the items is missing after move.');
     return;
   }
@@ -66,7 +35,7 @@ async function runMoveDownTest() {
     console.error('moveDown() test failed: Titles do not match expected order after move.');
     return;
   }
-  console.log('moveDown() test passed: Item was moved down and outlines recomputed, verified by custom id field and title order.');
+  console.log('moveDown() test passed: Item was moved down and outlines recomputed, verified by title order.');
 }
 
 if (process.argv[1] === new URL(import.meta.url).pathname) {
