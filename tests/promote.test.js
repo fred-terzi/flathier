@@ -1,52 +1,21 @@
-import fs from 'fs/promises';
-import path from 'path';
-import init from '../src/commands/init.js';
-import * as dataHandler from '../src/dataHandler.js';
-import addObject from '../src/core/addObject.js';
 import promote from '../src/core/promote.js';
 
 async function runPromoteTest() {
-  // Use the default extension for consistency
-  const testExt = '.fhr';
-  const testFileName = 'TestProject';
-  const extNoDot = testExt.slice(1);
-  const idField = `${extNoDot}_ID`;
-  const folderPath = path.join(process.cwd(), `.${extNoDot}`);
+  // Use mock data: Root -> First Item, Second Item; First Item -> Child of First
+  const data = [
+    { outline: '0', hier: 0, title: 'Root' },
+    { outline: '0.1', hier: 1, title: 'First Item' },
+    { outline: '0.1.1', hier: 2, title: 'Child of First' },
+    { outline: '0.2', hier: 1, title: 'Second Item' }
+  ];
 
-  // Clean up before test
-  try { await fs.rm(folderPath, { recursive: true, force: true }); } catch {}
+  // Promote 'Child of First' (should become a sibling of 'First Item', after it)
+  const promotedData = promote(data, '0.1.1');
 
-  // Use init to create the test folder and files
-  await init(testFileName, testExt);
-  let data = await dataHandler.loadData();
+  // Find the promoted node and its former parent
+  const promoted = promotedData.find(item => item.title === 'Child of First');
+  const parent = promotedData.find(item => item.title === 'First Item');
 
-  // Add two new objects after the first item (outline '0')
-  data = await addObject(data, '0', 'First Item');
-  data = await addObject(data, '1', 'Second Item');
-
-  // Add a child to 'First Item'
-  const first = data.find(item => item.title === 'First Item');
-  data = await addObject(data, first.outline, 'Child of First');
-
-  // Find the child
-  const child = data.find(item => item.title === 'Child of First');
-  if (!child) {
-    console.error('promote() test failed: Could not add child to promote.');
-    return;
-  }
-
-  // Print data before promote
-  console.log('Before promote:', data.map(item => ({title: item.title, outline: item.outline, [idField]: item[idField]})));
-
-  // Promote the child (should move it up one level, to be a sibling of its parent)
-  const promotedData = promote(data, child.outline);
-
-  // Print data after promote
-  console.log('After promote:', promotedData.map(item => ({title: item.title, outline: item.outline, [idField]: item[idField]})));
-
-  // Find the new outline of the promoted child
-  const promoted = promotedData.find(item => item[idField] === child[idField]);
-  const parent = promotedData.find(item => item[idField] === first[idField]);
   if (!promoted || !parent) {
     console.error('promote() test failed: Promoted or parent item missing after promote.');
     return;
@@ -57,13 +26,13 @@ async function runPromoteTest() {
     return;
   }
   // The promoted child should come immediately after its parent
-  const parentIdx = promotedData.findIndex(item => item[idField] === parent[idField]);
-  const promotedIdx = promotedData.findIndex(item => item[idField] === promoted[idField]);
+  const parentIdx = promotedData.findIndex(item => item.title === 'First Item');
+  const promotedIdx = promotedData.findIndex(item => item.title === 'Child of First');
   if (promotedIdx !== parentIdx + 1) {
     console.error('promote() test failed: Promoted child is not immediately after its parent.');
     return;
   }
-  console.log('promote() test passed: Child was promoted to be a sibling of its parent, verified by custom id field and outline.');
+  console.log('promote() test passed: Child was promoted to be a sibling of its parent, verified by title and outline.');
 }
 
 if (process.argv[1] === new URL(import.meta.url).pathname) {
