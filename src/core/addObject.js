@@ -1,11 +1,10 @@
 // src/commands/addObject.js
 import generateUniqueId from '../utils/generateUniqueId.js';
 import computeOutlines from '../utils/computeOutlines.js';
-import getCustomExt from '../utils/getCustomExt.js';
 
 /**
  * Inserts a new object immediately after the item with the specified outline number,
- * assigns unique IDs to all custom extension _ID fields, and recomputes outlines for the entire list.
+ * assigns a unique ID to the new object, and recomputes outlines for the entire list.
  *
  * @async
  * @param {Array<Object>} data - The array of objects to modify.
@@ -15,17 +14,6 @@ import getCustomExt from '../utils/getCustomExt.js';
  * @throws {Error} - Throws an error if the outline number is invalid.
  */
 export default async function addObject(data, outlineNumber, newObject) {
-  let customExt;
-  try {
-    customExt = await getCustomExt();
-    customExt = (typeof customExt === 'string') ? customExt.trim() : String(customExt || '').trim();
-    if (!customExt) {
-      throw new Error('Custom extension is not defined or invalid.');
-    }
-  } catch (err) {
-    throw new Error(`Failed to load custom extension: ${err.message}`);
-  }
-
   // 1. Find the selected index based on the outline number
   const selectedIndex = data.findIndex(item => item.outline === outlineNumber);
 
@@ -41,13 +29,8 @@ export default async function addObject(data, outlineNumber, newObject) {
   newObject.hier = parentHier; // inherit parent's hierarchy
   newObject.outline = 'pending'; // placeholder until computeOutlines runs
 
-  // Generalize _ID assignment using custom extension
-  if (!customExt) {
-    throw new Error('Custom extension is not defined or invalid.');
-  }
-
-  // Assign unique IDs to all matching _ID fields
-  await assignCustomIds(newObject, customExt);
+  // Assign unique ID to the new object if it has an _ID field
+  await assignUniqueId(newObject);
 
   // 3. Insert and update selection
   const insertPos = selectedIndex + 1;
@@ -60,17 +43,16 @@ export default async function addObject(data, outlineNumber, newObject) {
 }
 
 /**
- * Assigns a generated unique ID to the field in the object that matches the custom extension _ID pattern (case-sensitive, exact match).
+ * Assigns a generated unique ID to the field in the object that ends with _ID (case-sensitive, exact match).
  *
  * @async
  * @param {Object} obj - The object to update.
- * @param {string} customExt - The custom extension string (e.g., '.fhr').
  * @returns {Promise<void>} - Resolves when the matching field has been updated.
  */
-async function assignCustomIds(obj, customExt) {
-  const extNoDot = customExt.startsWith('.') ? customExt.slice(1) : customExt;
-  const idField = `${extNoDot}_ID`;
-  if (Object.prototype.hasOwnProperty.call(obj, idField)) {
-    obj[idField] = await generateUniqueId();
+async function assignUniqueId(obj) {
+  for (const key of Object.keys(obj)) {
+    if (key.endsWith('_ID')) {
+      obj[key] = await generateUniqueId();
+    }
   }
 }

@@ -1,38 +1,33 @@
-import fs from 'fs/promises';
-import path from 'path';
 import addObject from '../src/core/addObject.js';
-import init from '../src/commands/init.js';
-import * as dataHandler from '../src/dataHandler.js';
 
 async function runAddObjectTest() {
-  // Use the default extension for consistency
-  const testExt = '.fhr';
-  const testFileName = 'TestProject';
-  const extNoDot = testExt.slice(1);
-  const extWithJson = `${extNoDot}.json`;
-  const folderPath = path.join(process.cwd(), `.${extNoDot}`);
-  const mainFileName = `${testFileName}.${extWithJson}`;
-  const mainFilePath = path.join(folderPath, mainFileName);
-
-  // Clean up before test
-  try { await fs.rm(folderPath, { recursive: true, force: true }); } catch {}
-
-  // Use init to create the test folder and files
-  await init(testFileName, testExt);
-  let data = await dataHandler.loadData();
+  // Prepare mock data: a simple hierarchy with one root item
+  let data = [
+    {
+      title: 'Root',
+      outline: '0',
+      hier: '0',
+      test_ID: 'root-id'
+    }
+  ];
 
   // Add a new object after the first item (outline '0')
   const newTitle = 'Added by addObject test';
   const outlineNumber = '0';
-  const idField = `${extNoDot}_ID`;
+  // Construct a new object with a generic _ID field
+  const newObject = { title: newTitle, test_ID: '' };
   try {
-    const updatedData = await addObject(data, outlineNumber, newTitle);
+    const updatedData = await addObject(data, outlineNumber, newObject);
+    console.log('Updated data after addObject:', JSON.stringify(updatedData, null, 2));
     if (!Array.isArray(updatedData)) throw new Error('addObject did not return an array');
     const found = updatedData.find(item => item.title === newTitle);
     if (!found) throw new Error('New object not found in data after addObject');
-    if (!found[idField]) throw new Error('New object missing custom ID field');
+    console.log('Newly added object:', JSON.stringify(found, null, 2));
+    // Check that any _ID field is present and non-empty
+    const idField = Object.keys(found).find(k => k.endsWith('_ID'));
+    if (!idField || !found[idField]) throw new Error('New object missing _ID field or value');
     if (found.outline === 'pending') throw new Error('New object outline not computed');
-    console.log('addObject() test passed: New object added with custom ID field and outline computed.');
+    console.log('addObject() test passed: New object added with _ID field and outline computed.');
   } catch (err) {
     console.error('addObject() test failed:', err.message);
     return;
