@@ -1,8 +1,8 @@
-
 /**
  * Builds an ASCII-art tree with proper connectors, treating the first top-level item as the main root.
- * @param {Array<{ outline: string, title: string }>} items - Items with 'outline' and 'title'
- * @returns {Array<Array<string>>} The ASCII art tree as an array of rows
+ * @param {Array<{ outline: string, title: string }>} items - Items with 'outline' and 'title'.
+ * @param {Array<string>} fieldsToInclude - Fields from each item to include in the output for each node.
+ * @returns {Array<string>} The ASCII art tree as an array of string rows (each row includes a newline character).
  */
 export default async function createAsciiTree(items, fieldsToInclude) {
 

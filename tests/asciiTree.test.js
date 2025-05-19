@@ -1,37 +1,18 @@
-import fs from 'fs/promises';
-import path from 'path';
-import init from '../src/commands/init.js';
-import * as dataHandler from '../src/dataHandler.js';
-import addObject from '../src/core/addObject.js';
 import createAsciiTree from '../src/core/asciiTree.js';
 
 async function runAsciiTreeTest() {
-  // Use the default extension for consistency
-  const testExt = '.fhr';
-  const testFileName = 'TestProject';
-  const extNoDot = testExt.slice(1);
-  const idField = `${extNoDot}_ID`;
-  const folderPath = path.join(process.cwd(), `.${extNoDot}`);
-
-  // Clean up before test
-  try { await fs.rm(folderPath, { recursive: true, force: true }); } catch {}
-
-  // Use init to create the test folder and files
-  await init(testFileName, testExt);
-  let data = await dataHandler.loadData();
-
-  // Add two new objects after the first item (outline '0')
-  data = await addObject(data, '0', 'First Item');
-  data = await addObject(data, '1', 'Second Item');
-
-  // Add a child to 'First Item'
-  const first = data.find(item => item.title === 'First Item');
-  data = await addObject(data, first.outline, 'Child of First');
+  // Use mock data instead of file system or external functions
+  const data = [
+    { outline: '0', title: 'TestProject' },
+    { outline: '0.1', title: 'First Item' },
+    { outline: '0.2', title: 'Second Item' },
+    { outline: '0.1.1', title: 'Child of First' }
+  ];
 
   // Prepare fields to include in the ASCII tree
   const fieldsToInclude = ['title'];
 
-  // Generate the ASCII tree
+  // Generate the ASCII tree (returns Array<string>, each row with a newline)
   const treeRows = await createAsciiTree(data, fieldsToInclude);
 
   // Print the ASCII tree
@@ -42,6 +23,10 @@ async function runAsciiTreeTest() {
     console.error('asciiTree() test failed: Output is empty or not an array.');
     return;
   }
+  if (!treeRows.every(row => typeof row === 'string' && row.endsWith('\n'))) {
+    console.error('asciiTree() test failed: Not all rows are strings ending with a newline.');
+    return;
+  }
   if (!treeRows.some(row => row.includes('First Item')) || !treeRows.some(row => row.includes('Child of First'))) {
     console.error('asciiTree() test failed: Output missing expected titles.');
     return;
@@ -50,7 +35,11 @@ async function runAsciiTreeTest() {
     console.error('asciiTree() test failed: Root node missing or not first.');
     return;
   }
-  console.log('asciiTree() test passed: Output contains expected structure and titles.');
+  if (!treeRows.some(row => row.includes('├──') || row.includes('└──'))) {
+    console.error('asciiTree() test failed: Output missing ASCII tree connector symbols.');
+    return;
+  }
+  console.log('asciiTree() test passed: Output contains expected structure, titles, and formatting.');
 }
 
 if (process.argv[1] === new URL(import.meta.url).pathname) {
