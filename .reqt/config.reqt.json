@@ -1,4 +1,5 @@
 {
-  "filepath": "./.reqt/flathier.reqt.json",
-  "templateFileName": "newObjectTemplate.json"
+  "projectTitle": "flathier",
+  "sotPath": "./.reqt/flathier.reqt.json",
+  "templatePath": "./.reqt/itemTemplate.reqt.json"
 }

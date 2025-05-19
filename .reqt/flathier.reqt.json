@@ -1,22 +1,14 @@
 [
   {
-    "title": "flathier",
-    "hier": "0",
+    "reqt_ID": "2025-05-19T14:15:46.556Z-aa74588f-.roundtrip",
+    "hier": 0,
     "outline": "0",
+    "title": "flathier",
+    "requirement": "REQUIREMENT",
+    "acceptance": "ACCEPTANCE",
+    "details": "DETAILS",
     "status": "NEW",
-    "description": "PLACEHOLDER",
     "test_exists": false,
-    "test_passed": false,
-    "reqt_ID": "2025-05-19T12:58:44.671Z-7edd0de7-.reqt"
-  },
-  {
-    "title": "New Item",
-    "hier": "0",
-    "outline": "1",
-    "status": "NEW",
-    "description": "PLACEHOLDER",
-    "test_exists": false,
-    "test_passed": false,
-    "reqt_ID": "2025-05-19T12:58:44.672Z-ab8d3b1c-.reqt"
+    "test_passed": false
   }
 ]
