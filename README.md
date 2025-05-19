@@ -1,12 +1,14 @@
-# flathier
+# FlatHier
+
+[![npm](https://img.shields.io/npm/v/@terzitech/flathier)](https://www.npmjs.com/package/@terzitech/flathier)
+[![License](https://img.shields.io/github/license/terzitech/flathier)](LICENSE)
 
 FlatHier is a lightweight Node.js library designed to create and manipulate hierarchical data stored in a flat JSON structure. It provides a set of core, data handling, and utility functions to manage hierarchical data efficiently.
 
 ## Features
 
 - **Core Functions**: Create, add, delete, promote, demote, and move hierarchical objects.
-- **Data Handling**: Load, save, and set hierarchical data.
-- **Utility Functions**: Generate ASCII tree representations, compute outlines, and sanitize user inputs.
+- **Utility Functions**: Generate ASCII tree representations, compute outlines, generate unique IDs, and more.
 
 ## Installation
 
