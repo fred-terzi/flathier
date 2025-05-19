@@ -15,39 +15,10 @@ Install the library using npm:
 ```bash
 npm install @terzitech/flathier
 ```
-Then use:
-```bash
-npx flathier
-```
-
-## Usage
-
-Import the library and use its functions:
-
-```javascript
-import flathier from '@terzitech/flathier';
-
-// Initialize a new hierarchy
-flathier.init();
-
-// Load existing hierarchy data from the .fhr.json file
-const data = flathier.loadData();
-
-// Add an object to the hierarchy
-/**
- * @param {Object} data - The object loaded from the file
- * @param {string} outline - The outline number of the item to add the new item under
- */
-flathier.addObject(data, "1");
-
-// Save the hierarchy to a file
-flathier.saveData();
-```
 
 ## API Reference
 
 ### Core Functions
-- `init()`: Initialize a new hierarchy.
 - `addObject(data, outlineNumber)`: Add an object to the hierarchy under the specified outline number.
 - `deleteObject(data, outlineNumber)`: Delete an object by its outlineNumber.
 - `promote(data, outlineNumber)`: Promote an object and its children in the hierarchy.
@@ -62,19 +33,9 @@ flathier.saveData();
   console.log(asciiTree);
   ```
 
-### Data Handling
-- `loadData(filePath)`: Load hierarchy data from the file. (Note: The file path is hard coded to `./.fhr.json` created during the init function to ensure a single source of truth.)
-- `saveData(filePath)`: Save hierarchy data to the file. (Note: The file path is hard coded to `./.fhr.json`.)
-- `setData(data)`: Set the hierarchy data only in memory.
-
 ### Utility Functions
 - `getLastItemOutline()`: Get the outline of the last item in the hierarchy.
 - `getLastTemplateObject()`: Get the template object for the last item in the hierarchy.
-
-## Template System
-
-Templates for new projects and items are defined in `src/fhrTemplates/fhrTemplate.json`. These templates are used when creating new hierarchy items and ensure consistency in structure.
-
 
 ## Contributing
 
