@@ -16,7 +16,7 @@
   {
     "title": "NEVER create a reqt_id",
     "readme": "exclude",
-    "readme_ai": "Use reqt -a or reqt -aa to create a new item. \n\n If you create a new item directly in the json, you must run reqt -c to clean the project. \n\n The reqt_id is a unique identifier for each item in the project."
+    "readme_ai": "Use reqt -a or reqt -aa to create a new item. \n\n The reqt_id is a unique identifier for each item in the project."
   },
   {
     "title": "ReqText Installation",
