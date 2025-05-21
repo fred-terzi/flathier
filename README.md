@@ -7,6 +7,11 @@ FlatHier is a lightweight Node.js library designed to create and manipulate hier
 - **Core Functions**: Create, add, delete, promote, demote, and move hierarchical objects.
 - **Utility Functions**: Generate ASCII tree representations, compute outlines, generate unique IDs, and more.
 
+## Demo Script
+A demo script is included in the `demo` directory. It showcases the library's capabilities and ascii tree generation. 
+
+![FlatHier Demo](demo/flathierDemo.gif)
+
 ## Installation
 
 Install the library using npm:
