@@ -178,6 +178,9 @@ async function runDemo() {
         }
     }
 
+    // Save the data after adding 100 items
+    saveData(addToEndData);
+
     const endTime = Date.now();
     const elapsedTime = endTime - startTime;
     await showAsciiTree(addToEndData, `Data after adding ${itemCount} items to the end:`);
