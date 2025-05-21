@@ -23,7 +23,7 @@
     "acceptance": "ACCEPTANCE",
     "readme": "README",
     "status": "NEW",
-    "readme_ai": "exclude",
+    "readme_ai": "include",
     "test_exists": false,
     "test_passed": false
   },

@@ -1,65 +1,49 @@
-# flathier
+# FlatHier
 
-FlatHier is a technical foundation for managing hierarchical data in a flat, ordered JSON format. It is engineered for maximum clarity, version control, and automation in requirements and project data management. FlatHier enables all hierarchical operations—such as add, delete, move, promote, demote, and outline computation—while maintaining a single, human-readable source of truth.
+[![npm](https://img.shields.io/npm/v/@terzitech/flathier)](https://www.npmjs.com/package/@terzitech/flathier)
+[![License](https://img.shields.io/github/license/terzitech/flathier)](LICENSE)
 
-Technical Highlights:
-- Flat, ordered JSON structure for efficient diffing and git integration
-- Deterministic outline and hierarchy computation for robust data integrity
-- Designed for seamless automation and programmatic manipulation
-- Enables granular tracking and editing of requirements, features, and project metadata
-- Optimized for both manual and automated workflows in modern development environments
+FlatHier is a lightweight Node.js library designed to create and manipulate hierarchical data stored in a flat JSON structure. It provides a set of core, data handling, and utility functions to manage hierarchical data efficiently.
 
-Use FlatHier to ensure your project's hierarchical data remains consistent, auditable, and ready for both human and machine consumption.
+## Features
 
-## addObject.js: Insert and ID new object after outline number
+- **Core Functions**: Create, add, delete, promote, demote, and move hierarchical objects.
+- **Utility Functions**: Generate ASCII tree representations, compute outlines, generate unique IDs, and more.
 
-The addObject.js module provides a function to insert a new item into a flat hierarchical data array, assign a unique ID, and update outlines. It ensures data integrity and proper error handling.
+## Installation
 
-## asciiTree.js: Render flat hierarchy as ASCII-art tree
+Install the library using npm:
 
-The asciiTree.js module provides a function to visualize a flat hierarchy as an ASCII-art tree, making it easy to inspect structure and relationships.
+```bash
+npm install @terzitech/flathier
+```
 
-## deleteObject.js: Delete item by outline and update hierarchy
+## API Reference
 
-The deleteObject.js module provides a function to remove an item from a flat hierarchical data array and update outlines, ensuring data integrity.
+### Core Functions
+- `addObject(data, outlineNumber)`: Add an object to the hierarchy under the specified outline number.
+- `deleteObject(data, outlineNumber)`: Delete an object by its outlineNumber.
+- `promote(data, outlineNumber)`: Promote an object and its children in the hierarchy.
+- `demote(data, outlineNumber)`: Demote an object and its children in the hierarchy.
+- `moveUp(data, outlineNumber)`: Move an object and its children up in the hierarchy.
+- `moveDown(data, outlineNumber)`: Move an object and its children down in the hierarchy.
+- `createAsciiTree(data, fieldsToInclude)`: Generate an ASCII representation of the hierarchy given the data and the fields from the object to include in the tree title.
+  
+  Example:
+  ```javascript
+  const asciiTree = flathier.createAsciiTree(data, ['title', 'status']);
+  console.log(asciiTree);
+  ```
 
-## demote.js: Demote node and subtree one level
+### Utility Functions
+- `getLastItemOutline()`: Get the outline of the last item in the hierarchy.
+- `getLastTemplateObject()`: Get the template object for the last item in the hierarchy.
 
-The demote.js module provides a function to demote a node and its subtree, updating the flat hierarchy structure.
+## Contributing
 
-## moveDown.js: Move node and subtree down among siblings
+Contributions are welcome! Please fork the repository and submit a pull request.
 
-The moveDown.js module provides a function to move a node and its subtree down among siblings, updating the flat hierarchy structure.
+## License
 
-## moveUp.js: Move node and subtree up among siblings
+This project is licensed under the AGPL-3.0 License. See the [LICENSE](LICENSE) file for details.
 
-The moveUp.js module provides a function to move a node and its subtree up among siblings, updating the flat hierarchy structure.
-
-## promote.js: Promote node and subtree one level up
-
-The promote.js module provides a function to promote a node and its subtree, updating the flat hierarchy structure.
-
-## buildTree.js: Build nested tree from flat array
-
-The buildTree.js utility provides a function to convert a flat hierarchy into a nested tree, enabling hierarchical operations and visualizations.
-
-## computeOutlines.js: Recompute outline numbers for all items
-
-The computeOutlines.js utility ensures that all items in a flat hierarchy have correct outline numbers after any structural modification.
-
-## editTitle.js: Edit the title of an item by outline
-
-The editTitle.js utility provides a function to update the title of an item in a flat hierarchy by outline number.
-
-## flattenTree.js: Flatten nested tree to flat array
-
-The flattenTree.js utility provides a function to flatten a nested tree structure into a flat array for storage or further processing.
-
-## generateUniqueId.js: Generate unique IDs for items
-
-The generateUniqueId.js utility provides a function to generate unique, timestamp-based IDs for use in hierarchical data structures.
-
----
-Generated by **ReqText v0.1.0-demo.21** on 2025-05-21T03:43:01.176Z
-
-[ReqText Github Repo](https://github.com/joseph-terzi/reqtext)
