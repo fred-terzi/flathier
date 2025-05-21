@@ -12,7 +12,7 @@ FlatHier is a lightweight Node.js library designed to create and manipulate hier
 Install the library using npm:
 
 ```bash
-npm install @terzitech/flathier
+npm install flathier
 ```
 
 ## API Reference
