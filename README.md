@@ -1,8 +1,5 @@
 # FlatHier
 
-[![npm](https://img.shields.io/npm/v/@terzitech/flathier)](https://www.npmjs.com/package/@terzitech/flathier)
-[![License](https://img.shields.io/github/license/terzitech/flathier)](LICENSE)
-
 FlatHier is a lightweight Node.js library designed to create and manipulate hierarchical data stored in a flat JSON structure. It provides a set of core, data handling, and utility functions to manage hierarchical data efficiently.
 
 ## Features
