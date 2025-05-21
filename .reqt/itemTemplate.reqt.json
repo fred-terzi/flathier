@@ -1,0 +1,14 @@
+{
+  "reqt_ID": "reqt_ID",
+  "hier": 0,
+  "outline": "OUTLINE",
+  "title": "TITLE",
+  "details": "DETAILS",
+  "requirement": "REQUIREMENT",
+  "acceptance": "ACCEPTANCE",
+  "readme": "README",
+  "status": "NEW",
+  "readme_ai": "exclude",
+  "test_exists": false,
+  "test_passed": false
+}
