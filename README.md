@@ -10,7 +10,7 @@ FlatHier is a lightweight Node.js library designed to create and manipulate hier
 ## Demo Script
 A demo script is included in the `demo` directory. It showcases the library's capabilities and ascii tree generation. 
 
-![FlatHier Demo](demo/flathierDemo.gif)
+![FlatHier Demo](demo/output.gif)
 
 ## Installation
 
