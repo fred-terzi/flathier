@@ -10,36 +10,36 @@
     "readme": "FlatHier is a technical foundation for managing hierarchical data in a flat, ordered JSON format. It is engineered for maximum clarity, version control, and automation in requirements and project data management. FlatHier enables all hierarchical operations—such as add, delete, move, promote, demote, and outline computation—while maintaining a single, human-readable source of truth.\n\nTechnical Highlights:\n- Flat, ordered JSON structure for efficient diffing and git integration\n- Deterministic outline and hierarchy computation for robust data integrity\n- Designed for seamless automation and programmatic manipulation\n- Enables granular tracking and editing of requirements, features, and project metadata\n- Optimized for both manual and automated workflows in modern development environments\n\nUse FlatHier to ensure your project's hierarchical data remains consistent, auditable, and ready for both human and machine consumption.",
     "status": "Done",
     "readme_ai": "include",
-    "test_exists": true,
-    "test_passed": true
+    "test_exists": "true",
+    "test_passed": "true"
   },
   {
     "reqt_ID": "2025-05-21T03:44:27.601Z-431b1bdb",
     "hier": 0,
     "outline": "1",
     "title": "Installation",
-    "details": "DETAILS",
-    "requirement": "REQUIREMENT",
-    "acceptance": "ACCEPTANCE",
-    "readme": "README",
-    "status": "NEW",
+    "details": "FlatHier is distributed as an npm package. Users can install it locally for project use or globally for CLI access. The package includes all core and utility modules, and no post-install configuration is required. Installation steps and troubleshooting tips are provided in the project README. Installation is validated through automated and manual tests on supported platforms.",
+    "requirement": "Must provide a simple, reliable installation process for the FlatHier library via npm, supporting both local and global installation. Installation must make all core features available and ready to use with minimal setup.",
+    "acceptance": "- Users can install FlatHier using `npm install flathier` or `npm install -g flathier`.\n- After installation, users can import and use FlatHier in their projects without additional configuration.\n- All core modules are accessible after installation.\n- Installation instructions are documented in the README.\n- Installation is tested and verified on at least Linux and one other major OS.",
+    "readme": "To install FlatHier, run:\n\n```bash\nnpm install flathier\n```\n\nOr for global CLI usage:\n\n```bash\nnpm install -g flathier\n```\n\nAfter installation, you can import FlatHier modules in your project or use the CLI if installed globally. See the README for more details and usage examples.",
+    "status": "Done",
     "readme_ai": "include",
-    "test_exists": false,
-    "test_passed": false
+    "test_exists": "true",
+    "test_passed": "true"
   },
   {
     "reqt_ID": "2025-05-21T03:44:41.504Z-992bdab5",
     "hier": 0,
     "outline": "2",
     "title": "Core Functions",
-    "details": "DETAILS",
-    "requirement": "REQUIREMENT",
-    "acceptance": "ACCEPTANCE",
-    "readme": "README",
-    "status": "NEW",
+    "details": "The core functions of FlatHier are implemented as modular JavaScript files in the `src/core/` directory. Each function is responsible for a specific operation on the flat hierarchy data structure, such as inserting, deleting, moving, promoting, or demoting items, as well as rendering the hierarchy as an ASCII-art tree. All core functions are covered by automated tests in the `tests/` directory, and their status is tracked in this requirements document. The successful implementation and testing of these modules ensure the reliability and usability of the FlatHier library.",
+    "requirement": "Must provide all essential core functions for managing a flat hierarchy, including adding, deleting, moving, promoting, demoting, and visualizing items. Each function must operate on a flat JSON structure, maintain data integrity, and support robust error handling.",
+    "acceptance": "- All core function modules (addObject, asciiTree, deleteObject, demote, moveDown, moveUp, promote) are implemented, tested, and documented.\n- Each function passes its respective tests and meets its requirement and acceptance criteria.\n- Functions handle edge cases and invalid input gracefully.\n- Core functions are accessible after installation and can be used programmatically.\n- Documentation describes usage and expected behavior for each function.",
+    "readme": "FlatHier's core functions provide all the essential operations needed to manage a flat, ordered hierarchy of items. These include adding, deleting, moving, promoting, demoting, and visualizing items. Each function is modular, well-documented, and thoroughly tested, ensuring robust and predictable behavior for all hierarchy management tasks.",
+    "status": "Done",
     "readme_ai": "exclude",
-    "test_exists": false,
-    "test_passed": false
+    "test_exists": "true",
+    "test_passed": "true"
   },
   {
     "reqt_ID": "2025-05-21T03:14:24.688Z-246c2b85",
@@ -49,11 +49,11 @@
     "details": "Implements insertion of a new object into a flat hierarchical array after a specified outline number. Inherits hierarchy, assigns a unique ID to any _ID field, and recomputes outlines for all items. Handles errors gracefully if the outline number is invalid.",
     "requirement": "Must insert a new object after a given outline number, assign a unique ID to any field ending with _ID, and recompute outline numbers for all items. Must not modify data if the outline number is invalid.",
     "acceptance": "- New object appears immediately after the specified outline number.\n- New object has a unique ID in the correct field.\n- Outline numbers are correct and consistent after insertion.\n- No changes are made if the outline number is invalid, and an error is logged.",
-    "readme": "The addObject.js module provides a function to insert a new item into a flat hierarchical data array, assign a unique ID, and update outlines. It ensures data integrity and proper error handling.",
+    "readme": "The addObject.js module provides a function to insert a new item into a flat hierarchical data array, assign a unique ID, and update outlines. It ensures data integrity and proper error handling.\n\n**Example Usage:**\n\n```js\nimport flathier from 'flathier';\n\nconst data = [\n  { outline: '0', title: 'Root', hier: 0 },\n  { outline: '1', title: 'First Item', hier: 1 },\n  { outline: '1.1', title: 'Child', hier: 1 },\n  { outline: '2', title: 'Sibling', hier: 0 },\n  { outline: '2.1', title: 'Another Child', hier: 1 }\n  // ... more items\n];\n\nconst newItem = { title: 'New Sibling'};\n\n(async () => {\n  const updated = await flathier.addObject(data, '1', newItem);\n  // updated now contains the new item after outline '1', with a unique reqt_ID and correct outlines\n})();\n```\n\n- Note: `addObject` is accessed as a property of the main `flathier` package export. It is asynchronous and returns a Promise.\n- If not already present `hier`, `outline`, or `reqt_ID` fields, they will be added to the new item.",
     "status": "Done",
     "readme_ai": "include",
-    "test_exists": true,
-    "test_passed": true
+    "test_exists": "true",
+    "test_passed": "true"
   },
   {
     "reqt_ID": "2025-05-21T03:14:24.853Z-15c924e7",
@@ -66,8 +66,8 @@
     "readme": "The asciiTree.js module provides a function to visualize a flat hierarchy as an ASCII-art tree, making it easy to inspect structure and relationships.",
     "status": "Done",
     "readme_ai": "include",
-    "test_exists": true,
-    "test_passed": true
+    "test_exists": "true",
+    "test_passed": "true"
   },
   {
     "reqt_ID": "2025-05-21T03:14:25.030Z-8beb2478",
@@ -80,8 +80,8 @@
     "readme": "The deleteObject.js module provides a function to remove an item from a flat hierarchical data array and update outlines, ensuring data integrity.",
     "status": "Done",
     "readme_ai": "include",
-    "test_exists": true,
-    "test_passed": true
+    "test_exists": "true",
+    "test_passed": "true"
   },
   {
     "reqt_ID": "2025-05-21T03:14:25.234Z-10e47560",
@@ -94,8 +94,8 @@
     "readme": "The demote.js module provides a function to demote a node and its subtree, updating the flat hierarchy structure.",
     "status": "Done",
     "readme_ai": "include",
-    "test_exists": true,
-    "test_passed": true
+    "test_exists": "true",
+    "test_passed": "true"
   },
   {
     "reqt_ID": "2025-05-21T03:14:25.390Z-9307aa56",
@@ -108,8 +108,8 @@
     "readme": "The moveDown.js module provides a function to move a node and its subtree down among siblings, updating the flat hierarchy structure.",
     "status": "Done",
     "readme_ai": "include",
-    "test_exists": true,
-    "test_passed": true
+    "test_exists": "true",
+    "test_passed": "true"
   },
   {
     "reqt_ID": "2025-05-21T03:14:25.588Z-4d92511c",
@@ -122,8 +122,8 @@
     "readme": "The moveUp.js module provides a function to move a node and its subtree up among siblings, updating the flat hierarchy structure.",
     "status": "Done",
     "readme_ai": "include",
-    "test_exists": true,
-    "test_passed": true
+    "test_exists": "true",
+    "test_passed": "true"
   },
   {
     "reqt_ID": "2025-05-21T03:14:25.726Z-52e313cd",
@@ -136,8 +136,8 @@
     "readme": "The promote.js module provides a function to promote a node and its subtree, updating the flat hierarchy structure.",
     "status": "Done",
     "readme_ai": "include",
-    "test_exists": true,
-    "test_passed": true
+    "test_exists": "true",
+    "test_passed": "true"
   },
   {
     "reqt_ID": "2025-05-21T03:44:55.158Z-3fc53c59",
@@ -150,8 +150,8 @@
     "readme": "README",
     "status": "NEW",
     "readme_ai": "exclude",
-    "test_exists": false,
-    "test_passed": false
+    "test_exists": "false",
+    "test_passed": "false"
   },
   {
     "reqt_ID": "2025-05-21T03:14:25.873Z-2f157233",
@@ -164,8 +164,8 @@
     "readme": "The buildTree.js utility provides a function to convert a flat hierarchy into a nested tree, enabling hierarchical operations and visualizations.",
     "status": "Done",
     "readme_ai": "include",
-    "test_exists": true,
-    "test_passed": true
+    "test_exists": "true",
+    "test_passed": "true"
   },
   {
     "reqt_ID": "2025-05-21T03:14:26.036Z-3165bb30",
@@ -178,8 +178,8 @@
     "readme": "The computeOutlines.js utility ensures that all items in a flat hierarchy have correct outline numbers after any structural modification.",
     "status": "Done",
     "readme_ai": "include",
-    "test_exists": true,
-    "test_passed": true
+    "test_exists": "true",
+    "test_passed": "true"
   },
   {
     "reqt_ID": "2025-05-21T03:14:26.191Z-184d74d5",
@@ -192,8 +192,8 @@
     "readme": "The editTitle.js utility provides a function to update the title of an item in a flat hierarchy by outline number.",
     "status": "Done",
     "readme_ai": "include",
-    "test_exists": true,
-    "test_passed": true
+    "test_exists": "true",
+    "test_passed": "true"
   },
   {
     "reqt_ID": "2025-05-21T03:14:26.345Z-ace32d0d",
@@ -206,8 +206,8 @@
     "readme": "The flattenTree.js utility provides a function to flatten a nested tree structure into a flat array for storage or further processing.",
     "status": "Done",
     "readme_ai": "include",
-    "test_exists": true,
-    "test_passed": true
+    "test_exists": "true",
+    "test_passed": "true"
   },
   {
     "reqt_ID": "2025-05-21T03:14:26.495Z-c5078ce8",
@@ -220,7 +220,7 @@
     "readme": "The generateUniqueId.js utility provides a function to generate unique, timestamp-based IDs for use in hierarchical data structures.",
     "status": "Done",
     "readme_ai": "include",
-    "test_exists": true,
-    "test_passed": true
+    "test_exists": "true",
+    "test_passed": "true"
   }
 ]
