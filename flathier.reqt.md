@@ -155,7 +155,7 @@ exclude
 
 <!-- reqt_id: 2025-05-21T03:14:24.688Z-246c2b85 --start-->
 
-### 2.1: addObject.js: Insert and ID new object after outline number
+### 2.1: addObject(): Insert new object after outline number
 
 <!-- reqt Table Non-Editable-->
 | Status | Test Exists | Test Passed |
@@ -224,7 +224,7 @@ include
 
 <!-- reqt_id: 2025-05-21T03:14:24.853Z-15c924e7 --start-->
 
-### 2.2: asciiTree.js: Render flat hierarchy as ASCII-art tree
+### 2.2: asciiTree(): Render flat hierarchy as ASCII-art tree
 
 <!-- reqt Table Non-Editable-->
 | Status | Test Exists | Test Passed |
@@ -253,7 +253,32 @@ include
 <!-- reqt_README_field-->
 **README:**
 
- The asciiTree.js module provides a function to visualize a flat hierarchy as an ASCII-art tree, making it easy to inspect structure and relationships.
+ The asciiTree.js module provides a function to visualize a flat hierarchy as an ASCII-art tree, making it easy to inspect structure and relationships. It takes an array of items (each with at least 'outline' and 'title' fields) and an array of additional fields to include in the output. The function sorts items, builds parent-child relationships, and treats the first top-level item as the main root, attaching any additional top-level nodes as its children. The output is an array of strings, each representing a row of the ASCII tree, with proper connectors and indentation.
+
+**Example Usage:**
+
+```js
+import flathier from 'flathier';
+
+const items = [
+  { outline: '1', title: 'Root' },
+  { outline: '1.1', title: 'Child A' },
+  { outline: '1.2', title: 'Child B' },
+  { outline: '2', title: 'Another Root' }
+];
+
+const treeRows = await flathier.asciiTree(items, ['title']);
+console.log(treeRows.join(''));
+// Output:
+// └── 1: Root
+//     ├── 1.1: Child A
+//     └── 1.2: Child B
+//     └── 2: Another Root
+```
+
+- Note: The function is asynchronous and returns an array of strings (one per row, each ending with a newline character).
+- You can specify which fields to include in each node's label by passing an array of field names as the second argument.
+- Multiple top-level nodes are attached to the first as children for a single-rooted display.
 
 <!-- Make Content "exclude" to exclude from README generation -->
 
@@ -268,7 +293,7 @@ include
 
 <!-- reqt_id: 2025-05-21T03:14:25.030Z-8beb2478 --start-->
 
-### 2.3: deleteObject.js: Delete item by outline and update hierarchy
+### 2.3: deleteObject(): Delete item by outline and update hierarchy
 
 <!-- reqt Table Non-Editable-->
 | Status | Test Exists | Test Passed |
@@ -311,7 +336,7 @@ include
 
 <!-- reqt_id: 2025-05-21T03:14:25.234Z-10e47560 --start-->
 
-### 2.4: demote.js: Demote node and subtree one level
+### 2.4: demote(): Demote node and subtree one level
 
 <!-- reqt Table Non-Editable-->
 | Status | Test Exists | Test Passed |
@@ -354,7 +379,7 @@ include
 
 <!-- reqt_id: 2025-05-21T03:14:25.390Z-9307aa56 --start-->
 
-### 2.5: moveDown.js: Move node and subtree down among siblings
+### 2.5: moveDown(): Move node and subtree down among siblings
 
 <!-- reqt Table Non-Editable-->
 | Status | Test Exists | Test Passed |
@@ -397,7 +422,7 @@ include
 
 <!-- reqt_id: 2025-05-21T03:14:25.588Z-4d92511c --start-->
 
-### 2.6: moveUp.js: Move node and subtree up among siblings
+### 2.6: moveUp(): Move node and subtree up among siblings
 
 <!-- reqt Table Non-Editable-->
 | Status | Test Exists | Test Passed |
@@ -440,7 +465,7 @@ include
 
 <!-- reqt_id: 2025-05-21T03:14:25.726Z-52e313cd --start-->
 
-### 2.7: promote.js: Promote node and subtree one level up
+### 2.7: promote(): Promote node and subtree one level up
 
 <!-- reqt Table Non-Editable-->
 | Status | Test Exists | Test Passed |
@@ -524,7 +549,7 @@ exclude
 
 <!-- reqt_id: 2025-05-21T03:14:25.873Z-2f157233 --start-->
 
-### 3.1: buildTree.js: Build nested tree from flat array
+### 3.1: buildTree(): Build nested tree from flat array
 
 <!-- reqt Table Non-Editable-->
 | Status | Test Exists | Test Passed |
@@ -567,7 +592,7 @@ include
 
 <!-- reqt_id: 2025-05-21T03:14:26.036Z-3165bb30 --start-->
 
-### 3.2: computeOutlines.js: Recompute outline numbers for all items
+### 3.2: computeOutlines(): Recompute outline numbers for all items
 
 <!-- reqt Table Non-Editable-->
 | Status | Test Exists | Test Passed |
@@ -609,7 +634,7 @@ include
 
 <!-- reqt_id: 2025-05-21T03:14:26.191Z-184d74d5 --start-->
 
-### 3.3: editTitle.js: Edit the title of an item by outline
+### 3.3: editTitle(): Edit the title of an item by outline
 
 <!-- reqt Table Non-Editable-->
 | Status | Test Exists | Test Passed |
@@ -651,7 +676,7 @@ include
 
 <!-- reqt_id: 2025-05-21T03:14:26.345Z-ace32d0d --start-->
 
-### 3.4: flattenTree.js: Flatten nested tree to flat array
+### 3.4: flattenTree(): Flatten nested tree to flat array
 
 <!-- reqt Table Non-Editable-->
 | Status | Test Exists | Test Passed |
@@ -694,7 +719,7 @@ include
 
 <!-- reqt_id: 2025-05-21T03:14:26.495Z-c5078ce8 --start-->
 
-### 3.5: generateUniqueId.js: Generate unique IDs for items
+### 3.5: generateUniqueId(): Generate unique IDs for items
 
 <!-- reqt Table Non-Editable-->
 | Status | Test Exists | Test Passed |
