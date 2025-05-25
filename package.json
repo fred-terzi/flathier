@@ -8,7 +8,7 @@
     "testClean": "node tests/cleanup.js",
     "test": "for f in tests/*.js; do node \"$f\"; done"
   },
-  "author": "Joseph Terzi",
+  "author": "Fred Terzi",
   "license": "AGPL-3.0",
   "exports": {
     ".": "./lib/api.js"
