@@ -9,7 +9,7 @@
     "test": "for f in tests/*.js; do node \"$f\"; done"
   },
   "author": "Fred Terzi",
-  "license": "AGPL-3.0",
+  "license": "MIT",
   "exports": {
     ".": "./lib/api.js"
   },
